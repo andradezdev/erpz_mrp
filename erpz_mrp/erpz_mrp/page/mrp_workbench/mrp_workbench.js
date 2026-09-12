@@ -84,8 +84,7 @@ class MRPWorkbench {
 		// Button: Efetivar Documentos
 		this.btn_execute = this.page.add_button(__("Efetivar Abastecimento"), function() {
 			me.execute_scenario();
-		});
-		this.btn_execute.$btn.addClass("btn-danger");
+		}, { btn_class: "btn-danger" });
 	}
 
 	render_layout() {
