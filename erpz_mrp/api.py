@@ -69,7 +69,10 @@ def get_mrp_summary(ticket_name, company=None, item_code=None, supply_type=None,
             ["generated_docname", "like", f"%{item_code}%"]
         ]
         
-    total_count = frappe.db.count("MRP Result", filters=filters, or_filters=or_filters)
+    if or_filters:
+        total_count = len(frappe.get_all("MRP Result", filters=filters, or_filters=or_filters, pluck="name"))
+    else:
+        total_count = frappe.db.count("MRP Result", filters=filters)
     results = frappe.get_all(
         "MRP Result",
         filters=filters,
