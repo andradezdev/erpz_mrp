@@ -195,7 +195,8 @@ class MRPWorkbench {
 											<th width="30"><input type="checkbox" id="check-all-results"></th>
 											<th>Produto Atual</th>
 											<th>Produto Originador</th>
-											<th>Origem / Documento</th>
+											<th>Origem / Demanda</th>
+											<th>Doc Gerado / OP</th>
 											<th>Data Necessidade</th>
 											<th>Data Abastecimento</th>
 											<th>Demanda</th>
@@ -204,11 +205,11 @@ class MRPWorkbench {
 											<th>Abastecimento</th>
 											<th>Empresa Destino</th>
 											<th>Situação</th>
-											<th>Ações</th>
+											<th style="min-width: 140px;">Ações</th>
 										</tr>
 									</thead>
 									<tbody id="mrp-summary-tbody">
-										<tr><td colspan="13" class="text-center text-muted p-4">Selecione ou calcule um Ticket MRP.</td></tr>
+										<tr><td colspan="14" class="text-center text-muted p-4">Selecione ou calcule um Ticket MRP.</td></tr>
 									</tbody>
 								</table>
 							</div>
@@ -410,12 +411,35 @@ class MRPWorkbench {
 							(it.supply_type === "Compra" ? "mrp-badge-purchase" : "mrp-badge-transfer");
 						const statusBadge = `mrp-badge-${(it.status || "pendente").toLowerCase()}`;
 
+						// Origin doc link
+						let originHtml = "-";
+						if (it.origin_name) {
+							originHtml = `<a href="#" class="btn-open-doc text-dark font-weight-bold" data-doctype="${it.origin_doctype || 'Sales Order'}" data-docname="${it.origin_name}" title="Abrir ${it.origin_doctype || 'Origem'} ${it.origin_name}"><i class="octicon octicon-link-external mr-1 text-muted"></i>${it.origin_name}</a>`;
+						}
+
+						// Generated doc (Work Order / Material Request / Stock Entry)
+						let generatedHtml = `<span class="text-muted small">-</span>`;
+						if (it.generated_docname) {
+							generatedHtml = `<a href="#" class="btn-open-doc text-primary font-weight-bold" data-doctype="${it.generated_doctype || 'Work Order'}" data-docname="${it.generated_docname}" title="Abrir ${it.generated_doctype || 'OP'} ${it.generated_docname}"><i class="octicon octicon-link-external mr-1"></i><b>${it.generated_docname}</b></a>`;
+						} else if (it.supply_type === "Produção") {
+							generatedHtml = `<span class="badge badge-light text-muted">Pendente (OP)</span>`;
+						}
+
+						// Actions
+						let opActionBtn = "";
+						if (it.generated_docname) {
+							opActionBtn = `<button class="btn btn-xs btn-primary btn-open-doc mr-1" data-doctype="${it.generated_doctype || 'Work Order'}" data-docname="${it.generated_docname}" title="Abrir ${it.generated_doctype} ${it.generated_docname}"><i class="octicon octicon-link-external"></i> Abrir OP</button>`;
+						} else if (it.supply_type === "Produção") {
+							opActionBtn = `<button class="btn btn-xs btn-default btn-create-op mr-1" data-item="${it.item_code}" data-qty="${it.suggested_qty}" data-date="${it.need_date}" data-supply="${it.supply_date}" data-bom="${it.bom_no || ''}" data-origin="${it.origin_name || ''}" data-company="${it.company}" title="Criar / Abrir Ordem de Produção"><i class="octicon octicon-plus"></i> Abrir OP</button>`;
+						}
+
 						const row = $(`
 							<tr>
 								<td><input type="checkbox" class="mrp-row-check" data-id="${it.name}"></td>
 								<td><strong>${it.item_code}</strong><br><small class="text-muted">${it.item_name || ''}</small></td>
 								<td>${it.origin_item || '-'}</td>
-								<td>${it.origin_name || it.origin_doctype || '-'}</td>
+								<td>${originHtml}</td>
+								<td>${generatedHtml}</td>
 								<td>${frappe.datetime.str_to_user(it.need_date)}</td>
 								<td>${frappe.datetime.str_to_user(it.supply_date)}</td>
 								<td>${it.gross_demand}</td>
@@ -424,7 +448,8 @@ class MRPWorkbench {
 								<td><span class="mrp-badge ${supplyBadge}">${it.supply_type}</span></td>
 								<td>${it.company}</td>
 								<td><span class="mrp-badge ${statusBadge}">${it.status}</span></td>
-								<td>
+								<td class="d-flex align-items-center">
+									${opActionBtn}
 									<button class="btn btn-xs btn-default btn-view-timeline" data-item="${it.item_code}" title="Ver Timeline">
 										<i class="octicon octicon-graph"></i>
 									</button>
@@ -439,6 +464,36 @@ class MRPWorkbench {
 							if (me.timeline_item_select) {
 								me.timeline_item_select.set_value(item);
 							}
+						});
+					});
+
+					tbody.off("click", ".btn-open-doc").on("click", ".btn-open-doc", function(e) {
+						e.preventDefault();
+						const doctype = $(this).data("doctype");
+						const docname = $(this).data("docname");
+						if (doctype && docname) {
+							frappe.set_route("Form", doctype, docname);
+						}
+					});
+
+					tbody.off("click", ".btn-create-op").on("click", ".btn-create-op", function(e) {
+						e.preventDefault();
+						const item = $(this).data("item");
+						const qty = $(this).data("qty");
+						const supply_date = $(this).data("supply");
+						const need_date = $(this).data("date");
+						const bom = $(this).data("bom");
+						const origin = $(this).data("origin");
+						const comp = $(this).data("company");
+						frappe.new_doc("Work Order", {
+							production_item: item,
+							bom_no: bom,
+							qty: qty,
+							planned_start_date: supply_date,
+							expected_delivery_date: need_date,
+							company: comp,
+							custom_mrp_ticket: me.current_ticket,
+							custom_mrp_origin_demand: origin
 						});
 					});
 				} else {

@@ -54,23 +54,32 @@ def get_mrp_summary(ticket_name, company=None, item_code=None, supply_type=None,
     filters = {"mrp_ticket": ticket_name}
     if company:
         filters["company"] = company
-    if item_code:
-        filters["item_code"] = item_code
     if supply_type:
         filters["supply_type"] = supply_type
     if status:
         filters["status"] = status
         
-    total_count = frappe.db.count("MRP Result", filters=filters)
+    or_filters = None
+    if item_code:
+        # Search across item_code, item_name, origin_name, or generated_docname
+        or_filters = [
+            ["item_code", "like", f"%{item_code}%"],
+            ["item_name", "like", f"%{item_code}%"],
+            ["origin_name", "like", f"%{item_code}%"],
+            ["generated_docname", "like", f"%{item_code}%"]
+        ]
+        
+    total_count = frappe.db.count("MRP Result", filters=filters, or_filters=or_filters)
     results = frappe.get_all(
         "MRP Result",
         filters=filters,
+        or_filters=or_filters,
         fields=[
             "name", "item_code", "item_name", "company", "warehouse",
             "need_date", "supply_date", "gross_demand", "initial_stock",
             "planned_inflows", "projected_balance", "safety_stock",
             "net_requirement", "suggested_qty", "supply_type",
-            "origin_item", "origin_doctype", "origin_name",
+            "origin_item", "origin_doctype", "origin_name", "bom_no",
             "bom_level", "lead_time_days", "from_company", "from_warehouse",
             "status", "situation", "generated_doctype", "generated_docname"
         ],
