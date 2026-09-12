@@ -9,8 +9,8 @@ app_license = "mit"
 # ------------------
 
 # Installation & Migrations
-after_install = "erpz_mrp.setup.setup_mrp_custom_fields"
-after_migrate = "erpz_mrp.setup.setup_mrp_custom_fields"
+after_install = "erpz_mrp.setup.after_install"
+after_migrate = "erpz_mrp.setup.after_migrate"
 
 # Includes in <head>
 # ------------------
