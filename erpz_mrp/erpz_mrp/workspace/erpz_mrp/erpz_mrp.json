@@ -1,13 +1,14 @@
 {
  "category": "Modules",
  "charts": [],
+ "content": "[{\"id\":\"h_shortcuts\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Atalhos Rápidos</b></span>\",\"col\":12}},{\"id\":\"sc_workbench\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Painel de Planejamento\",\"col\":4}},{\"id\":\"sc_ticket\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tickets de Cálculo\",\"col\":4}},{\"id\":\"sc_result\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugestões de Abastecimento\",\"col\":4}},{\"id\":\"spacer_1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"h_cards\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Módulos e Consultas</b></span>\",\"col\":12}},{\"id\":\"card_ops\",\"type\":\"card\",\"data\":{\"card_name\":\"Central e Operações\",\"col\":4}},{\"id\":\"card_res\",\"type\":\"card\",\"data\":{\"card_name\":\"Resultados e Consultas\",\"col\":4}},{\"id\":\"card_param\",\"type\":\"card\",\"data\":{\"card_name\":\"Cadastros e Parâmetros\",\"col\":4}}]",
  "creation": "2026-09-12 20:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,
- "icon": "octicon octicon-project",
+ "icon": "project",
  "idx": 1,
  "indicator_color": "blue",
  "is_hidden": 0,
@@ -27,7 +28,7 @@
    "is_query_report": 0,
    "label": "Painel de Planejamento MRP",
    "link_count": 0,
-   "link_to": "mrp_workbench",
+   "link_to": "mrp-workbench",
    "link_type": "Page",
    "onboard": 1,
    "type": "Link"
@@ -94,7 +95,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Logs e Auditoria",
+   "label": "Auditoria e Logs",
    "link_count": 0,
    "link_to": "MRP Log",
    "link_type": "DocType",
@@ -153,6 +154,15 @@
  "sequence_id": 1.0,
  "shortcuts": [
   {
+   "color": "Blue",
+   "doc_view": "List",
+   "format": "Painel MRP",
+   "label": "Painel de Planejamento",
+   "link_to": "mrp-workbench",
+   "stats_filter": "[]",
+   "type": "Page"
+  },
+  {
    "color": "Grey",
    "doc_view": "List",
    "format": "{} Tickets",
@@ -171,5 +181,6 @@
    "type": "DocType"
   }
  ],
- "title": "ERPZ MRP"
+ "title": "ERPZ MRP",
+ "type": "Workspace"
 }
