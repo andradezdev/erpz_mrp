@@ -548,25 +548,70 @@ class MRPWorkbench {
 	render_tree_nodes(nodes, parentEl) {
 		const me = this;
 		nodes.forEach(node => {
-			const typeBadge = node.supply_type === "Produção" ? "badge-primary" :
-				(node.supply_type === "Compra" ? "badge-warning" : "badge-info");
-
-			const itemNode = $(`
-				<div class="mrp-tree-node">
-					<div class="mrp-tree-item">
-						<i class="octicon octicon-chevron-right text-muted"></i>
-						<strong>${node.child_item}</strong>
-						<span class="badge ${typeBadge}">${node.supply_type}</span>
-						<span class="text-muted small">Qtd: ${node.allocated_qty}</span>
-						<span class="text-muted small">Para: ${frappe.datetime.str_to_user(node.need_date)}</span>
-						<span class="small font-weight-bold ml-auto">${node.demand_source_doctype}: ${node.demand_source_name}</span>
+			if (node.is_root_demand) {
+				const rootCard = $(`
+					<div class="mrp-tree-root mb-3">
+						<div class="mrp-tree-root-header p-2 d-flex align-items-center" style="cursor: pointer;">
+							<span class="mrp-tree-toggle mr-2"><i class="octicon octicon-chevron-down"></i></span>
+							<i class="octicon octicon-file-text text-primary mr-1"></i>
+							<strong class="text-primary">${node.demand_source_doctype}: ${node.demand_source_name}</strong>
+							<span class="badge badge-info ml-2">${(node.children || []).length} Nível Raiz</span>
+						</div>
+						<div class="mrp-tree-children"></div>
 					</div>
-					<div class="mrp-tree-children"></div>
-				</div>
-			`).appendTo(parentEl);
+				`).appendTo(parentEl);
 
-			if (node.children && node.children.length > 0) {
-				me.render_tree_nodes(node.children, itemNode.find(".mrp-tree-children"));
+				rootCard.find("> .mrp-tree-root-header").on("click", function(e) {
+					const ch = rootCard.find("> .mrp-tree-children");
+					const icon = $(this).find(".mrp-tree-toggle i");
+					ch.slideToggle(150);
+					icon.toggleClass("octicon-chevron-down octicon-chevron-right");
+				});
+
+				if (node.children && node.children.length > 0) {
+					me.render_tree_nodes(node.children, rootCard.find("> .mrp-tree-children"));
+				}
+			} else {
+				const typeBadge = node.supply_type === "Produção" ? "mrp-badge-produce" :
+					(node.supply_type === "Compra" ? "mrp-badge-purchase" : "mrp-badge-transfer");
+				const hasChildren = node.children && node.children.length > 0;
+				const toggleIcon = hasChildren ? `<span class="mrp-tree-toggle mr-1" style="cursor: pointer;"><i class="octicon octicon-chevron-down"></i></span>` : `<span class="mr-3"></span>`;
+
+				const itemNode = $(`
+					<div class="mrp-tree-node-wrap mb-2">
+						<div class="mrp-tree-card d-flex align-items-center justify-content-between p-2" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+							<div class="d-flex align-items-center flex-grow-1">
+								${toggleIcon}
+								<div>
+									<strong>${node.child_item}</strong> <small class="text-muted">${node.item_name || ''}</small>
+									<div class="small text-muted">
+										<span>Qtd: <b>${node.allocated_qty}</b></span> &bull;
+										<span>Início: ${frappe.datetime.str_to_user(node.planned_start_date)}</span> &bull;
+										<span>Necessidade: ${frappe.datetime.str_to_user(node.need_date)}</span>
+									</div>
+								</div>
+							</div>
+							<div class="d-flex align-items-center gap-2">
+								<span class="mrp-badge ${typeBadge}">${node.supply_type}</span>
+								<span class="badge badge-light">${node.to_company}</span>
+								<span class="badge badge-secondary">${node.target_doctype}: ${node.target_docname || 'Sugestão'}</span>
+							</div>
+						</div>
+						<div class="mrp-tree-children" style="margin-left: 24px; padding-left: 14px; border-left: 2px solid #cbd5e0;"></div>
+					</div>
+				`).appendTo(parentEl);
+
+				if (hasChildren) {
+					itemNode.find("> .mrp-tree-card .mrp-tree-toggle").on("click", function(e) {
+						e.stopPropagation();
+						const ch = itemNode.find("> .mrp-tree-children");
+						const icon = $(this).find("i");
+						ch.slideToggle(150);
+						icon.toggleClass("octicon-chevron-down octicon-chevron-right");
+					});
+
+					me.render_tree_nodes(node.children, itemNode.find("> .mrp-tree-children"));
+				}
 			}
 		});
 	}

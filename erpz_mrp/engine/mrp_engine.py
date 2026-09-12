@@ -176,20 +176,30 @@ class MRPEngine:
             if getdate(self.ticket.to_date) < getdate(self.ticket.from_date):
                 raise frappe.ValidationError("Data final não pode ser menor que a data inicial.")
                 
-            # 2. Load Item Master Parameters
+            # 2. Clear previous results for this ticket if re-running
+            frappe.db.delete("MRP Demand", {"mrp_ticket": self.ticket_name})
+            frappe.db.delete("MRP Stock", {"mrp_ticket": self.ticket_name})
+            frappe.db.delete("MRP Planned Inflow", {"mrp_ticket": self.ticket_name})
+            frappe.db.delete("MRP Result", {"mrp_ticket": self.ticket_name})
+            frappe.db.delete("MRP Timeline", {"mrp_ticket": self.ticket_name})
+            frappe.db.delete("MRP Traceability", {"mrp_ticket": self.ticket_name})
+            frappe.db.delete("MRP Log", {"mrp_ticket": self.ticket_name})
+            frappe.db.delete("MRP Aglutination Link", {"mrp_ticket": self.ticket_name})
+
+            # 3. Load Item Master Parameters
             self.load_items_master()
             
-            # 3. Load BOM structures
+            # 4. Load BOM structures
             self.bom_cache.load_boms()
             
-            # 4. Load Stock Snapshots
+            # 5. Load Stock Snapshots
             self.stock_cache.load_bins()
             self.record_stock_snapshots()
             
-            # 5. Load Demands
+            # 6. Load Demands
             self.load_demands()
             
-            # 6. Load Scheduled Inflows
+            # 7. Load Scheduled Inflows
             self.load_scheduled_inflows()
             
             # 7. Process Timeline and Calculate Net Requirements

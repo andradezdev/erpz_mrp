@@ -132,7 +132,14 @@ def get_timeline_data(ticket_name, item_code=None, company=None):
 
 @frappe.whitelist()
 def get_traceability_tree(ticket_name, root_demand=None):
-    """Builds a hierarchical tree from MRP Traceability nodes."""
+    """
+    Builds a true hierarchical tree structure matching Sections 71, 72, 88, 92 of the MRP specification:
+    Level Root: Demand Document (ex: Pedido de Venda SAL-ORD-2026-00009)
+      └── Level 0: Produto Acabado (TEST-MRP-A) - Sugestão de Produção
+          ├── Level 1: Componente B (TEST-MRP-B) - Produção
+          └── Level 1: Componente C (TEST-MRP-C) - Transferência / Compra
+    """
+    from collections import defaultdict
     nodes = frappe.get_all(
         "MRP Traceability",
         filters={"mrp_ticket": ticket_name},
@@ -146,28 +153,48 @@ def get_traceability_tree(ticket_name, root_demand=None):
         order_by="bom_level ASC, need_date ASC"
     )
     
-    # Build tree representation
-    # Top nodes are level 0
-    tree = []
-    level_map = {}
+    # 1. Deduplicate nodes to avoid duplicate branches
+    unique_nodes = []
+    seen = set()
+    for n in nodes:
+        key = (n.demand_source_doctype, n.demand_source_name, n.parent_item, n.child_item, n.bom_level, flt(n.required_qty), n.supply_type)
+        if key not in seen:
+            seen.add(key)
+            node_dict = dict(n)
+            node_dict["item_name"] = frappe.db.get_value("Item", n.child_item, "item_name") or n.child_item
+            node_dict["children"] = []
+            unique_nodes.append(node_dict)
+
+    # 2. Build tree by attaching Level 1 to Level 0, Level 2 to Level 1, etc.
+    level_0 = [n for n in unique_nodes if n["bom_level"] == 0]
     
-    for node in nodes:
-        key = (node.demand_source_name, node.child_item, node.bom_level)
-        node_dict = dict(node)
-        node_dict["children"] = []
-        level_map[key] = node_dict
-        
-        if node.bom_level == 0:
-            tree.append(node_dict)
-        else:
-            # Attach to parent if found
-            parent_key = (node.demand_source_name, node.parent_item, node.bom_level - 1)
-            parent = level_map.get(parent_key)
-            if parent:
-                parent["children"].append(node_dict)
-            else:
-                tree.append(node_dict)
-                
+    def attach_children(parent_node):
+        p_item = parent_node["child_item"]
+        p_level = parent_node["bom_level"]
+        for candidate in unique_nodes:
+            if candidate["bom_level"] == p_level + 1 and candidate.get("parent_item") == p_item:
+                candidate_copy = dict(candidate)
+                candidate_copy["children"] = []
+                attach_children(candidate_copy)
+                parent_node["children"].append(candidate_copy)
+
+    # Group Level 0 by Demand Source (e.g. Sales Order)
+    demands_group = defaultdict(list)
+    for n0 in level_0:
+        attach_children(n0)
+        group_key = (n0.get("demand_source_doctype") or "Demanda", n0.get("demand_source_name") or "Manual")
+        demands_group[group_key].append(n0)
+
+    tree = []
+    for (src_type, src_name), items in demands_group.items():
+        tree.append({
+            "is_root_demand": True,
+            "demand_source_doctype": src_type,
+            "demand_source_name": src_name,
+            "label": f"{src_type}: {src_name}",
+            "children": items
+        })
+
     return tree
 
 @frappe.whitelist()
