@@ -1,0 +1,154 @@
+{
+ "actions": [],
+ "creation": "2026-09-12 19:35:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mrp_ticket",
+  "item_code",
+  "item_name",
+  "company",
+  "warehouse",
+  "demand_date",
+  "quantity",
+  "uom",
+  "source_type",
+  "source_name",
+  "source_item_row",
+  "origin_item"
+ ],
+ "fields": [
+  {
+   "fieldname": "mrp_ticket",
+   "fieldtype": "Link",
+   "label": "Ticket MRP",
+   "options": "MRP Ticket",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Descrição",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Empresa",
+   "options": "Company",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Depósito",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "demand_date",
+   "fieldtype": "Date",
+   "label": "Data da Demanda",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Float",
+   "label": "Quantidade",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "label": "Unidade",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "source_type",
+   "fieldtype": "Select",
+   "label": "Tipo de Origem",
+   "options": "Sales Order\nProduction Plan\nMaterial Request\nBOM Dependent\nManual\nPrevisão",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "source_name",
+   "fieldtype": "Data",
+   "label": "Documento de Origem",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "source_item_row",
+   "fieldtype": "Data",
+   "label": "Item Origem"
+  },
+  {
+   "fieldname": "origin_item",
+   "fieldtype": "Link",
+   "label": "Produto Originador",
+   "options": "Item"
+  }
+ ],
+ "links": [],
+ "modified": "2026-09-12 19:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "ERPZ MRP",
+ "name": "MRP Demand",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

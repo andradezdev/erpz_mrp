@@ -1,0 +1,118 @@
+{
+ "actions": [],
+ "creation": "2026-09-12 19:35:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "from_company",
+  "to_company",
+  "item_code",
+  "lead_time_days",
+  "day_type",
+  "priority",
+  "is_active"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_company",
+   "fieldtype": "Link",
+   "label": "Empresa Origem",
+   "options": "Company",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "to_company",
+   "fieldtype": "Link",
+   "label": "Empresa Destino",
+   "options": "Company",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item (Vazio = Todos)",
+   "options": "Item",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "lead_time_days",
+   "fieldtype": "Int",
+   "label": "Lead Time (Dias)",
+   "reqd": 1,
+   "default": "2",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "day_type",
+   "fieldtype": "Select",
+   "label": "Tipo de Prazo",
+   "options": "Dias Úteis\nDias Corridos",
+   "default": "Dias Úteis",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Prioridade de Rota",
+   "default": "1"
+  },
+  {
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Ativo",
+   "default": "1",
+   "in_list_view": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-09-12 19:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "ERPZ MRP",
+ "name": "MRP Inter Company Lead Time",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "format:{from_company}-{to_company}-{item_code}"
+}

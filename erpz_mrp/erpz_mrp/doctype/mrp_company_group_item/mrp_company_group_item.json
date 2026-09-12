@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "creation": "2026-09-12 19:35:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "priority",
+  "allow_transfer",
+  "allow_production",
+  "allow_purchase",
+  "holiday_list",
+  "default_warehouse"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Empresa Participante",
+   "options": "Company",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Prioridade de Abastecimento",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "allow_transfer",
+   "fieldtype": "Check",
+   "label": "Permite Transferência",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "allow_production",
+   "fieldtype": "Check",
+   "label": "Permite Produzir",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "allow_purchase",
+   "fieldtype": "Check",
+   "label": "Permite Comprar",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "holiday_list",
+   "fieldtype": "Link",
+   "label": "Lista de Feriados",
+   "options": "Holiday List",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "default_warehouse",
+   "fieldtype": "Link",
+   "label": "Depósito Padrão",
+   "options": "Warehouse"
+  }
+ ],
+ "links": [],
+ "modified": "2026-09-12 19:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "ERPZ MRP",
+ "name": "MRP Company Group Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "istable": 1
+}

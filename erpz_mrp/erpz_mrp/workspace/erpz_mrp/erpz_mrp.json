@@ -1,0 +1,175 @@
+{
+ "category": "Modules",
+ "charts": [],
+ "creation": "2026-09-12 20:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "octicon octicon-project",
+ "idx": 1,
+ "indicator_color": "blue",
+ "is_hidden": 0,
+ "label": "ERPZ MRP",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Central e Operações",
+   "link_count": 0,
+   "link_type": "Section Break",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Painel de Planejamento MRP",
+   "link_count": 0,
+   "link_to": "mrp_workbench",
+   "link_type": "Page",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Tickets de Cálculo (Cenários)",
+   "link_count": 0,
+   "link_to": "MRP Ticket",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Resultados e Consultas",
+   "link_count": 0,
+   "link_type": "Section Break",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Necessidades e Sugestões",
+   "link_count": 0,
+   "link_to": "MRP Result",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Linha do Tempo de Saldos",
+   "link_count": 0,
+   "link_to": "MRP Timeline",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Rastreabilidade de Demandas",
+   "link_count": 0,
+   "link_to": "MRP Traceability",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Documentos Efetivados",
+   "link_count": 0,
+   "link_to": "MRP Executed Document",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Logs e Auditoria",
+   "link_count": 0,
+   "link_to": "MRP Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cadastros e Parâmetros",
+   "link_count": 0,
+   "link_type": "Section Break",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Parâmetros do MRP",
+   "link_count": 0,
+   "link_to": "MRP Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Grupos de Empresas Multiempresa",
+   "link_count": 0,
+   "link_to": "MRP Company Group",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Lead Time entre Empresas",
+   "link_count": 0,
+   "link_to": "MRP Inter Company Lead Time",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-09-12 20:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ERPZ MRP",
+ "name": "ERPZ MRP",
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 1.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "format": "{} Tickets",
+   "label": "Tickets de Cálculo",
+   "link_to": "MRP Ticket",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Sugestões",
+   "label": "Sugestões de Abastecimento",
+   "link_to": "MRP Result",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "ERPZ MRP"
+}

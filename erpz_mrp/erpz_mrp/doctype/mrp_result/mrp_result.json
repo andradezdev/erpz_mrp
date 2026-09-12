@@ -1,0 +1,303 @@
+{
+ "actions": [],
+ "creation": "2026-09-12 19:35:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mrp_ticket",
+  "item_code",
+  "item_name",
+  "company",
+  "warehouse",
+  "need_date",
+  "supply_date",
+  "gross_demand",
+  "initial_stock",
+  "planned_inflows",
+  "projected_balance",
+  "safety_stock",
+  "net_requirement",
+  "suggested_qty",
+  "min_order_qty",
+  "lot_multiple",
+  "economic_order_qty",
+  "supply_type",
+  "origin_item",
+  "origin_doctype",
+  "origin_name",
+  "origin_date",
+  "bom_no",
+  "bom_level",
+  "lead_time_days",
+  "from_company",
+  "from_warehouse",
+  "status",
+  "situation",
+  "is_aglutinated",
+  "aglutinated_items_count",
+  "generated_doctype",
+  "generated_docname"
+ ],
+ "fields": [
+  {
+   "fieldname": "mrp_ticket",
+   "fieldtype": "Link",
+   "label": "Ticket MRP",
+   "options": "MRP Ticket",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Produto Atual",
+   "options": "Item",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Descrição",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Empresa Destino",
+   "options": "Company",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Depósito",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "need_date",
+   "fieldtype": "Date",
+   "label": "Data da Necessidade",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "supply_date",
+   "fieldtype": "Date",
+   "label": "Data Abastecimento",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "gross_demand",
+   "fieldtype": "Float",
+   "label": "Demanda Bruta",
+   "default": "0"
+  },
+  {
+   "fieldname": "initial_stock",
+   "fieldtype": "Float",
+   "label": "Estoque Inicial",
+   "default": "0"
+  },
+  {
+   "fieldname": "planned_inflows",
+   "fieldtype": "Float",
+   "label": "Entradas Previstas",
+   "default": "0"
+  },
+  {
+   "fieldname": "projected_balance",
+   "fieldtype": "Float",
+   "label": "Saldo Projetado",
+   "default": "0"
+  },
+  {
+   "fieldname": "safety_stock",
+   "fieldtype": "Float",
+   "label": "Estoque Segurança",
+   "default": "0"
+  },
+  {
+   "fieldname": "net_requirement",
+   "fieldtype": "Float",
+   "label": "Necessidade Líquida",
+   "default": "0"
+  },
+  {
+   "fieldname": "suggested_qty",
+   "fieldtype": "Float",
+   "label": "Quantidade Sugerida",
+   "default": "0",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "min_order_qty",
+   "fieldtype": "Float",
+   "label": "Lote Mínimo",
+   "default": "0"
+  },
+  {
+   "fieldname": "lot_multiple",
+   "fieldtype": "Float",
+   "label": "Múltiplo",
+   "default": "0"
+  },
+  {
+   "fieldname": "economic_order_qty",
+   "fieldtype": "Float",
+   "label": "Lote Econômico",
+   "default": "0"
+  },
+  {
+   "fieldname": "supply_type",
+   "fieldtype": "Select",
+   "label": "Tipo de Abastecimento",
+   "options": "Produção\nCompra\nTransferência",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "origin_item",
+   "fieldtype": "Link",
+   "label": "Produto Originador",
+   "options": "Item",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "origin_doctype",
+   "fieldtype": "Data",
+   "label": "Doc Origem Demanda"
+  },
+  {
+   "fieldname": "origin_name",
+   "fieldtype": "Data",
+   "label": "Documento Origem",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "origin_date",
+   "fieldtype": "Date",
+   "label": "Data de Origem"
+  },
+  {
+   "fieldname": "bom_no",
+   "fieldtype": "Link",
+   "label": "Estrutura (BOM)",
+   "options": "BOM"
+  },
+  {
+   "fieldname": "bom_level",
+   "fieldtype": "Int",
+   "label": "Nível Estrutura",
+   "default": "0"
+  },
+  {
+   "fieldname": "lead_time_days",
+   "fieldtype": "Int",
+   "label": "Lead Time (Dias)",
+   "default": "0"
+  },
+  {
+   "fieldname": "from_company",
+   "fieldtype": "Link",
+   "label": "Empresa Fornecedora",
+   "options": "Company"
+  },
+  {
+   "fieldname": "from_warehouse",
+   "fieldtype": "Link",
+   "label": "Depósito Fornecedor",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Situação",
+   "options": "Pendente\nAprovado\nEfetivado\nDescartado\nAtrasado",
+   "default": "Pendente",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "situation",
+   "fieldtype": "Data",
+   "label": "Motivo da Sugestão"
+  },
+  {
+   "fieldname": "is_aglutinated",
+   "fieldtype": "Check",
+   "label": "Aglutinado",
+   "default": "0"
+  },
+  {
+   "fieldname": "aglutinated_items_count",
+   "fieldtype": "Int",
+   "label": "Demandas Aglutinadas",
+   "default": "1"
+  },
+  {
+   "fieldname": "generated_doctype",
+   "fieldtype": "Data",
+   "label": "DocType Gerado"
+  },
+  {
+   "fieldname": "generated_docname",
+   "fieldtype": "Data",
+   "label": "Documento Gerado"
+  }
+ ],
+ "links": [],
+ "modified": "2026-09-12 19:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "ERPZ MRP",
+ "name": "MRP Result",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

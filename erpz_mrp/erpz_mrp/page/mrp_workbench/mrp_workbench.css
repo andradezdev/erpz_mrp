@@ -1,0 +1,230 @@
+/* MRP Workbench Styles */
+.mrp-workbench {
+	padding: 15px;
+	font-family: var(--font-stack, inherit);
+}
+
+.mrp-header-card {
+	background: var(--card-bg, #ffffff);
+	border: 1px solid var(--border-color, #e2e8f0);
+	border-radius: 8px;
+	padding: 16px 20px;
+	margin-bottom: 20px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.mrp-stepper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid var(--border-color, #edf2f7);
+}
+
+.mrp-step {
+	display: flex;
+	align-items: center;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--text-muted, #718096);
+}
+
+.mrp-step.active {
+	color: var(--primary, #2490ef);
+	font-weight: 600;
+}
+
+.mrp-step.completed {
+	color: var(--green-600, #38a169);
+}
+
+.mrp-step-circle {
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: var(--bg-color, #edf2f7);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 8px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.mrp-step.active .mrp-step-circle {
+	background: var(--primary, #2490ef);
+	color: #fff;
+}
+
+.mrp-step.completed .mrp-step-circle {
+	background: var(--green-600, #38a169);
+	color: #fff;
+}
+
+.mrp-step-line {
+	flex: 1;
+	height: 2px;
+	background: var(--border-color, #e2e8f0);
+	margin: 0 12px;
+}
+
+/* KPI Cards */
+.mrp-kpi-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 15px;
+	margin-bottom: 20px;
+}
+
+.mrp-kpi-card {
+	background: var(--card-bg, #ffffff);
+	border: 1px solid var(--border-color, #e2e8f0);
+	border-radius: 8px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+	transition: transform 0.15s ease;
+}
+
+.mrp-kpi-card:hover {
+	transform: translateY(-2px);
+}
+
+.mrp-kpi-title {
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: var(--text-muted, #718096);
+	margin-bottom: 6px;
+}
+
+.mrp-kpi-val {
+	font-size: 24px;
+	font-weight: 700;
+	color: var(--text-color, #1a202c);
+}
+
+.mrp-kpi-val.text-warning { color: #dd6b20 !important; }
+.mrp-kpi-val.text-danger { color: #e53e3e !important; }
+.mrp-kpi-val.text-success { color: #38a169 !important; }
+.mrp-kpi-val.text-primary { color: #2b6cb0 !important; }
+
+/* Tabs container */
+.mrp-tabs-container {
+	background: var(--card-bg, #ffffff);
+	border: 1px solid var(--border-color, #e2e8f0);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.mrp-nav-tabs {
+	display: flex;
+	border-bottom: 1px solid var(--border-color, #e2e8f0);
+	background: var(--control-bg, #f7fafc);
+	padding: 0 10px;
+}
+
+.mrp-nav-tab {
+	padding: 12px 18px;
+	cursor: pointer;
+	font-weight: 600;
+	font-size: 13px;
+	color: var(--text-muted, #4a5568);
+	border-bottom: 2px solid transparent;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.mrp-nav-tab:hover {
+	color: var(--primary, #2490ef);
+}
+
+.mrp-nav-tab.active {
+	color: var(--primary, #2490ef);
+	border-bottom-color: var(--primary, #2490ef);
+	background: var(--card-bg, #ffffff);
+}
+
+.mrp-tab-content {
+	padding: 20px;
+}
+
+/* Filter bar inside tab */
+.mrp-filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 16px;
+	align-items: center;
+}
+
+/* Table styles */
+.mrp-table-wrap {
+	overflow-x: auto;
+}
+
+.mrp-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.mrp-table th {
+	background: var(--table-header-bg, #f8fafc);
+	padding: 10px 12px;
+	text-align: left;
+	font-weight: 600;
+	color: var(--text-muted, #4a5568);
+	border-bottom: 1px solid var(--border-color, #e2e8f0);
+	white-space: nowrap;
+}
+
+.mrp-table td {
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--border-color, #edf2f7);
+	vertical-align: middle;
+}
+
+.mrp-table tr:hover {
+	background: var(--table-hover-bg, #f7fafc);
+}
+
+/* Badges */
+.mrp-badge {
+	display: inline-block;
+	padding: 3px 8px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.mrp-badge-produce { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+.mrp-badge-purchase { background: #feebc8; color: #c05621; border: 1px solid #fbd38d; }
+.mrp-badge-transfer { background: #e9d8fd; color: #6b46c1; border: 1px solid #d6bcfa; }
+
+.mrp-badge-pendente { background: #feebc8; color: #9c4221; }
+.mrp-badge-aprovado { background: #e2e8f0; color: #2d3748; }
+.mrp-badge-efetivado { background: #c6f6d5; color: #22543d; }
+.mrp-badge-atrasado { background: #fed7d7; color: #9b2c2c; }
+
+/* Tree view */
+.mrp-tree-node {
+	margin-left: 20px;
+	border-left: 2px dashed var(--border-color, #cbd5e0);
+	padding-left: 12px;
+	margin-top: 8px;
+}
+
+.mrp-tree-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	background: var(--control-bg, #f7fafc);
+	padding: 8px 12px;
+	border-radius: 6px;
+	border: 1px solid var(--border-color, #e2e8f0);
+}

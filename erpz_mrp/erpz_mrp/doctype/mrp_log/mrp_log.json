@@ -1,0 +1,108 @@
+{
+ "actions": [],
+ "creation": "2026-09-12 19:35:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mrp_ticket",
+  "log_type",
+  "item_code",
+  "message",
+  "details",
+  "logged_at"
+ ],
+ "fields": [
+  {
+   "fieldname": "mrp_ticket",
+   "fieldtype": "Link",
+   "label": "Ticket MRP",
+   "options": "MRP Ticket",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "log_type",
+   "fieldtype": "Select",
+   "label": "Tipo",
+   "options": "Info\nAviso\nErro\nCiclo Circular\nSem Estrutura\nSem Lead Time",
+   "default": "Info",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Small Text",
+   "label": "Mensagem",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "details",
+   "fieldtype": "Text",
+   "label": "Detalhes"
+  },
+  {
+   "fieldname": "logged_at",
+   "fieldtype": "Datetime",
+   "label": "Data/Hora",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-09-12 19:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "ERPZ MRP",
+ "name": "MRP Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

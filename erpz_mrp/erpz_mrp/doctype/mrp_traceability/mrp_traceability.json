@@ -1,0 +1,186 @@
+{
+ "actions": [],
+ "creation": "2026-09-12 19:35:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mrp_ticket",
+  "demand_source_doctype",
+  "demand_source_name",
+  "root_item",
+  "parent_item",
+  "child_item",
+  "bom_level",
+  "required_qty",
+  "allocated_qty",
+  "supply_type",
+  "from_company",
+  "to_company",
+  "need_date",
+  "planned_start_date",
+  "target_doctype",
+  "target_docname",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "mrp_ticket",
+   "fieldtype": "Link",
+   "label": "Ticket MRP",
+   "options": "MRP Ticket",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "demand_source_doctype",
+   "fieldtype": "Data",
+   "label": "Tipo Origem Demanda",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "demand_source_name",
+   "fieldtype": "Data",
+   "label": "Documento Demanda",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "root_item",
+   "fieldtype": "Link",
+   "label": "Produto Raiz",
+   "options": "Item"
+  },
+  {
+   "fieldname": "parent_item",
+   "fieldtype": "Link",
+   "label": "Produto Pai",
+   "options": "Item"
+  },
+  {
+   "fieldname": "child_item",
+   "fieldtype": "Link",
+   "label": "Componente / Produto Atual",
+   "options": "Item",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "bom_level",
+   "fieldtype": "Int",
+   "label": "Nível",
+   "default": "0",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "required_qty",
+   "fieldtype": "Float",
+   "label": "Quantidade Requerida",
+   "default": "0",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "allocated_qty",
+   "fieldtype": "Float",
+   "label": "Quantidade Atendida",
+   "default": "0"
+  },
+  {
+   "fieldname": "supply_type",
+   "fieldtype": "Select",
+   "label": "Tipo de Abastecimento",
+   "options": "Produção\nCompra\nTransferência\nEstoque Existente",
+   "default": "Produção",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "from_company",
+   "fieldtype": "Link",
+   "label": "Empresa Origem",
+   "options": "Company"
+  },
+  {
+   "fieldname": "to_company",
+   "fieldtype": "Link",
+   "label": "Empresa Destino",
+   "options": "Company"
+  },
+  {
+   "fieldname": "need_date",
+   "fieldtype": "Date",
+   "label": "Data da Necessidade",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "planned_start_date",
+   "fieldtype": "Date",
+   "label": "Data Planejada Início",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "target_doctype",
+   "fieldtype": "Data",
+   "label": "Doc Gerado"
+  },
+  {
+   "fieldname": "target_docname",
+   "fieldtype": "Data",
+   "label": "Nome Doc Gerado",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Situação",
+   "options": "Planejado\nGerado\nAtendido\nParcial\nAtrasado",
+   "default": "Planejado",
+   "in_list_view": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-09-12 19:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "ERPZ MRP",
+ "name": "MRP Traceability",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
