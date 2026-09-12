@@ -3,7 +3,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import now_datetime, getdate, flt
+from frappe.utils import now_datetime, getdate, flt, cint
 from erpz_mrp.engine.mrp_engine import MRPEngine
 from erpz_mrp.engine.execution import execute_ticket_abastecimento
 
