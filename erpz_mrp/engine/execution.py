@@ -66,7 +66,43 @@ def execute_ticket_abastecimento(ticket_name, selected_result_ids=None):
                 bom = res.bom_no
 
             if not bom:
-                frappe.msgprint(f"Não foi possível criar Ordem de Produção para {res.item_code}: BOM não encontrada.")
+                # Item has no BOM -> Automatically generate Purchase Material Request via ERPNext Buying API
+                mr_buy = frappe.new_doc("Material Request")
+                mr_buy.material_request_type = "Purchase"
+                mr_buy.company = res.company
+                mr_buy.schedule_date = res.need_date
+                if hasattr(mr_buy, "custom_mrp_ticket"):
+                    mr_buy.custom_mrp_ticket = ticket_name
+                if hasattr(mr_buy, "custom_mrp_origin_demand"):
+                    mr_buy.custom_mrp_origin_demand = f"Sem Estrutura (BOM): {res.origin_name or ''}"
+                uom = frappe.db.get_value("Item", res.item_code, "stock_uom")
+                mr_buy.append("items", {
+                    "item_code": res.item_code,
+                    "qty": res.suggested_qty,
+                    "schedule_date": res.need_date,
+                    "warehouse": res.warehouse,
+                    "uom": uom
+                })
+                mr_buy.insert(ignore_permissions=True)
+                record_execution(
+                    ticket_name=ticket_name,
+                    doc_type="Material Request",
+                    doc_name=mr_buy.name,
+                    item_code=res.item_code,
+                    qty=res.suggested_qty,
+                    company=res.company,
+                    status=mr_buy.status or "Draft",
+                    origin_doctype=res.origin_doctype,
+                    origin_name=res.origin_name
+                )
+                frappe.db.set_value("MRP Result", res.name, {
+                    "generated_doctype": "Material Request",
+                    "generated_docname": mr_buy.name,
+                    "supply_type": "Compra",
+                    "situation": "Convertido em Compra (Item sem estrutura/BOM)",
+                    "status": "Efetivado"
+                })
+                created_docs.append({"doctype": "Material Request", "name": mr_buy.name, "item": res.item_code})
                 continue
 
             wo = frappe.new_doc("Work Order")

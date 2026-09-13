@@ -619,22 +619,20 @@ class MRPEngine:
         else:
             # Local Sourcing: Check if Produced (has BOM) or Purchased
             bom = self.bom_cache.get_bom(item_code, company)
-            is_produced = bool(bom) or (not item_meta.get("is_purchase_item") and item_meta.get("is_stock_item"))
             
-            if is_produced and not bom:
-                # Item should be produced but no BOM exists!
-                act = self.settings.missing_bom_action or "Gerar Alerta"
-                self.log("Sem Estrutura", f"Item {item_code} é fabricado mas não possui BOM padrão ativa.", item_code=item_code)
-                if act == "Bloquear Processamento":
-                    raise frappe.ValidationError(f"Item {item_code} não possui BOM ativa e a configuração exige bloqueio.")
-                supply_type = "Compra" if item_meta.get("is_purchase_item") else "Produção"
-                bom_no = None
-            elif is_produced and bom:
+            if bom:
                 supply_type = "Produção"
                 bom_no = bom.name
+                situation = "Demanda de Pedido / Necessidade Líquida" if gross_demand > 0 else "Manutenção do Estoque de Segurança"
             else:
+                # When item has NO valid BOM -> Automatically generate Purchase (Compra) via ERPNext Buying API
                 supply_type = "Compra"
                 bom_no = None
+                if not item_meta.get("is_purchase_item") and item_meta.get("is_stock_item"):
+                    situation = "Item sem estrutura (BOM) ativa -> Sugestão de Compra"
+                    self.log("Sem Estrutura", f"Item {item_code} não possui BOM padrão ativa. Gerada sugestão de Compra no ERPNext.", item_code=item_code)
+                else:
+                    situation = "Item de Compra / Matéria-prima"
                 
             eff_lead_time = lead_time
             supply_date = get_working_days_prior(
