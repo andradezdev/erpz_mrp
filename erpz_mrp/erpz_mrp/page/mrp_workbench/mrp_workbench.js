@@ -19,15 +19,11 @@ function show_mrp_workbench(wrapper) {
 }
 
 frappe.provide("frappe.pages");
-if (!frappe.pages["mrp-workbench"]) {
-	frappe.pages["mrp-workbench"] = {};
-}
+frappe.pages["mrp-workbench"] = frappe.pages["mrp-workbench"] || {};
 frappe.pages["mrp-workbench"].on_page_load = init_mrp_workbench;
 frappe.pages["mrp-workbench"].on_page_show = show_mrp_workbench;
 
-if (!frappe.pages["mrp_workbench"]) {
-	frappe.pages["mrp_workbench"] = {};
-}
+frappe.pages["mrp_workbench"] = frappe.pages["mrp_workbench"] || {};
 frappe.pages["mrp_workbench"].on_page_load = init_mrp_workbench;
 frappe.pages["mrp_workbench"].on_page_show = show_mrp_workbench;
 
