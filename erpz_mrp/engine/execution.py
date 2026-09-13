@@ -12,6 +12,14 @@ def execute_ticket_abastecimento(ticket_name, selected_result_ids=None):
     - Transferência -> Material Request (Purpose: Material Transfer) or Stock Entry
     """
     ticket = frappe.get_doc("MRP Ticket", ticket_name)
+    if ticket.status == "Efetivado":
+        frappe.msgprint(
+            title="Ticket Já Efetivado",
+            indicator="blue",
+            message=f"O Ticket {ticket_name} já foi efetivado anteriormente. Todos os documentos operacionais (Ordens de Produção, Requisições) já foram gerados e estão disponíveis para consulta."
+        )
+        return {"status": "already_executed", "created_count": 0, "documents": []}
+
     if ticket.status not in ("Aprovado", "Calculado", "Em Análise"):
         frappe.throw(f"O Ticket {ticket_name} deve estar em status 'Aprovado' para efetivação.")
 
@@ -35,7 +43,12 @@ def execute_ticket_abastecimento(ticket_name, selected_result_ids=None):
     )
 
     if not results:
-        frappe.throw("Nenhum resultado pendente encontrado para efetivação neste Ticket.")
+        frappe.msgprint(
+            title="Nenhuma Sugestão Pendente",
+            indicator="blue",
+            message=f"Todas as necessidades calculadas do Ticket {ticket_name} já foram efetivadas ou atendidas."
+        )
+        return {"status": "already_executed", "created_count": 0, "documents": []}
 
     created_docs = []
 

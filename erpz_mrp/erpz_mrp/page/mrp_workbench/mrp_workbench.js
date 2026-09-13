@@ -360,9 +360,26 @@ class MRPWorkbench {
 					$("#kpi-inconsistencies").text(m.total_inconsistencies);
 
 					me.update_stepper(m.status);
+					me.update_action_buttons(m.status);
 				}
 			}
 		});
+	}
+
+	update_action_buttons(status) {
+		if (status === "Efetivado") {
+			this.btn_execute.show().prop("disabled", true).addClass("disabled").text(__("Efetivado (Concluído)"));
+			this.btn_approve.hide();
+		} else if (status === "Aprovado") {
+			this.btn_execute.show().prop("disabled", false).removeClass("disabled").text(__("Efetivar Abastecimento"));
+			this.btn_approve.hide();
+		} else if (["Calculado", "Calculado (Simulação)", "Em Análise", "Com Inconsistências"].includes(status)) {
+			this.btn_approve.show().prop("disabled", false).removeClass("disabled");
+			this.btn_execute.show().prop("disabled", true).addClass("disabled").text(__("Efetivar Abastecimento"));
+		} else {
+			this.btn_approve.hide();
+			this.btn_execute.hide();
+		}
 	}
 
 	update_stepper(status) {
@@ -751,11 +768,19 @@ class MRPWorkbench {
 				freeze: true,
 				freeze_message: __("Gerando ordens no ERPNext..."),
 				callback: function(r) {
-					frappe.msgprint({
-						title: __("Efetivação Concluída"),
-						indicator: "green",
-						message: __("Foram gerados {0} documentos no ERPNext vinculados a este Ticket.", [r.message.created_count])
-					});
+					if (r.message && r.message.status === "already_executed") {
+						frappe.msgprint({
+							title: __("Ticket Já Efetivado"),
+							indicator: "blue",
+							message: __("Todos os documentos deste Ticket já foram efetivados e constam na tabela abaixo.")
+						});
+					} else if (r.message && r.message.created_count > 0) {
+						frappe.msgprint({
+							title: __("Efetivação Concluída"),
+							indicator: "green",
+							message: __("Foram gerados {0} documentos no ERPNext vinculados a este Ticket.", [r.message.created_count])
+						});
+					}
 					me.reload_all();
 				}
 			});
