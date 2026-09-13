@@ -99,6 +99,8 @@ def execute_ticket_abastecimento(ticket_name, selected_result_ids=None):
 
         # B. Transferência -> Material Request (Material Transfer)
         elif supply_type == "Transferência":
+            is_intercompany = bool(res.from_company and res.from_company != res.company)
+            
             mr = frappe.new_doc("Material Request")
             mr.material_request_type = "Material Transfer"
             mr.company = res.company
@@ -107,16 +109,26 @@ def execute_ticket_abastecimento(ticket_name, selected_result_ids=None):
             if hasattr(mr, "custom_mrp_ticket"):
                 mr.custom_mrp_ticket = ticket_name
             if hasattr(mr, "custom_mrp_origin_demand"):
-                mr.custom_mrp_origin_demand = res.origin_name
+                mr.custom_mrp_origin_demand = f"Transferência de {res.from_company or ''} ({res.from_warehouse or ''}) -> {res.company}"
 
-            mr.append("items", {
+            # Validate from_warehouse against mr.company
+            # ERPNext requires all warehouses in a document to belong to that document's company.
+            from_wh = None
+            if not is_intercompany and res.from_warehouse:
+                wh_company = frappe.db.get_value("Warehouse", res.from_warehouse, "company")
+                if wh_company == res.company:
+                    from_wh = res.from_warehouse
+
+            mr_item = {
                 "item_code": res.item_code,
                 "qty": res.suggested_qty,
                 "schedule_date": res.need_date,
-                "from_warehouse": res.from_warehouse,
                 "warehouse": res.warehouse
-            })
+            }
+            if from_wh:
+                mr_item["from_warehouse"] = from_wh
 
+            mr.append("items", mr_item)
             mr.insert(ignore_permissions=True)
 
             record_execution(
@@ -130,6 +142,38 @@ def execute_ticket_abastecimento(ticket_name, selected_result_ids=None):
                 origin_doctype=res.origin_doctype,
                 origin_name=res.origin_name
             )
+
+            # In intercompany transfers, also create dispatch Material Request in supplying company
+            if is_intercompany and res.from_company:
+                try:
+                    mr_from = frappe.new_doc("Material Request")
+                    mr_from.material_request_type = "Material Transfer"
+                    mr_from.company = res.from_company
+                    mr_from.schedule_date = res.supply_date or res.need_date
+                    if hasattr(mr_from, "custom_mrp_ticket"):
+                        mr_from.custom_mrp_ticket = ticket_name
+                    if hasattr(mr_from, "custom_mrp_origin_demand"):
+                        mr_from.custom_mrp_origin_demand = f"Fornecimento para {res.company} ({res.warehouse or ''})"
+                    mr_from.append("items", {
+                        "item_code": res.item_code,
+                        "qty": res.suggested_qty,
+                        "schedule_date": res.supply_date or res.need_date,
+                        "warehouse": res.from_warehouse
+                    })
+                    mr_from.insert(ignore_permissions=True)
+                    record_execution(
+                        ticket_name=ticket_name,
+                        doc_type="Material Request",
+                        doc_name=mr_from.name,
+                        item_code=res.item_code,
+                        qty=res.suggested_qty,
+                        company=res.from_company,
+                        status=mr_from.status or "Draft",
+                        origin_doctype="MRP Ticket",
+                        origin_name=ticket_name
+                    )
+                except Exception as e:
+                    frappe.log_error(title="Erro ao criar Material Request fornecedor", message=str(e))
 
             frappe.db.set_value("MRP Result", res.name, {
                 "generated_doctype": "Material Request",
