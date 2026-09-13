@@ -8,7 +8,7 @@ frappe.ui.form.on("MRP Ticket", {
 
 		// Button: Abrir Painel Interativo
 		frm.add_custom_button(__("Abrir Painel MRP"), function() {
-			frappe.set_route("mrp_workbench", { ticket: frm.doc.name });
+			frappe.set_route("mrp-workbench", { ticket: frm.doc.name });
 		}).addClass("btn-primary");
 
 		// Button: Calcular MRP
