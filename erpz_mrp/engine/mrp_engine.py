@@ -176,8 +176,8 @@ class MRPEngine:
             if getdate(self.ticket.to_date) < getdate(self.ticket.from_date):
                 raise frappe.ValidationError("Data final não pode ser menor que a data inicial.")
                 
-            # 2. Clear previous results for this ticket if re-running
-            frappe.db.delete("MRP Demand", {"mrp_ticket": self.ticket_name})
+            # 2. Clear previous results for this ticket if re-running (preserve Manual demands)
+            frappe.db.delete("MRP Demand", {"mrp_ticket": self.ticket_name, "source_type": ["!=", "Manual"]})
             frappe.db.delete("MRP Stock", {"mrp_ticket": self.ticket_name})
             frappe.db.delete("MRP Planned Inflow", {"mrp_ticket": self.ticket_name})
             frappe.db.delete("MRP Result", {"mrp_ticket": self.ticket_name})
@@ -368,6 +368,29 @@ class MRPEngine:
                     "origin_item": r.item_code,
                     "bom_level": 0
                 })
+
+        # 3. Manual Demands (Imported via Excel or added manually)
+        manual_rows = frappe.get_all(
+            "MRP Demand",
+            filters={"mrp_ticket": self.ticket_name, "source_type": "Manual"},
+            fields=["item_code", "item_name", "company", "warehouse", "demand_date", "quantity", "uom", "source_type", "source_name", "source_item_row", "origin_item"]
+        )
+        for m in manual_rows:
+            d_date = max(getdate(m.demand_date), getdate(from_d))
+            self.demands.append({
+                "item_code": m.item_code,
+                "item_name": m.item_name,
+                "company": m.company or company,
+                "warehouse": m.warehouse,
+                "demand_date": d_date,
+                "quantity": flt(m.quantity),
+                "uom": m.uom,
+                "source_type": "Manual",
+                "source_name": m.source_name or "Demanda Manual",
+                "source_item_row": m.get("source_item_row"),
+                "origin_item": m.item_code,
+                "bom_level": 0
+            })
 
     def load_scheduled_inflows(self):
         from_d = self.ticket.from_date
@@ -749,12 +772,13 @@ class MRPEngine:
                 })
 
     def persist_all(self):
-        # 1. Demands
-        if self.demands:
+        # 1. Demands (insert only auto-generated demands; manual demands are already saved)
+        new_demands = [d for d in self.demands if d.get("source_type") != "Manual"]
+        if new_demands:
             frappe.db.bulk_insert(
                 "MRP Demand",
                 ["name", "mrp_ticket", "item_code", "item_name", "company", "warehouse", "demand_date", "quantity", "uom", "source_type", "source_name", "source_item_row", "origin_item"],
-                [[frappe.generate_hash(length=12), self.ticket_name, d["item_code"], d.get("item_name"), d["company"], d.get("warehouse"), d["demand_date"], d["quantity"], d.get("uom"), d["source_type"], d.get("source_name"), d.get("source_item_row"), d.get("origin_item")] for d in self.demands]
+                [[frappe.generate_hash(length=12), self.ticket_name, d["item_code"], d.get("item_name"), d["company"], d.get("warehouse"), d["demand_date"], d["quantity"], d.get("uom"), d["source_type"], d.get("source_name"), d.get("source_item_row"), d.get("origin_item")] for d in new_demands]
             )
             
         # 2. Planned Inflows

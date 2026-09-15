@@ -125,7 +125,7 @@ def setup_mrp_desktop_and_sidebar():
         sb.app = "erpz_mrp"
         sb.standard = 1
         sb.append("items", {"label": "Home", "link_to": "ERPZ MRP", "link_type": "Workspace", "type": "Link", "icon": "home", "idx": 0})
-        sb.append("items", {"label": "Painel de Planejamento MRP", "link_to": "mrp-workbench", "link_type": "Page", "type": "Link", "icon": "project", "idx": 1})
+        sb.append("items", {"label": "Painel de Planejamento MRP", "link_to": "mrp_workbench", "link_type": "Page", "type": "Link", "icon": "project", "idx": 1})
         sb.append("items", {"label": "Tickets de Cálculo (MRP)", "link_to": "MRP Ticket", "link_type": "DocType", "type": "Link", "icon": "getting-started", "idx": 2})
         sb.append("items", {"label": "Resultados e Consultas", "type": "Section Break", "icon": "list-tree", "idx": 3})
         sb.append("items", {"label": "Sugestões de Abastecimento", "link_to": "MRP Result", "link_type": "DocType", "type": "Link", "child": 1, "icon": "clipboard-check", "idx": 4})
@@ -143,7 +143,7 @@ def setup_mrp_desktop_and_sidebar():
         sb = frappe.get_doc("Workspace Sidebar", "ERPZ MRP")
         sb.items = []
         sb.append("items", {"label": "Home", "link_to": "ERPZ MRP", "link_type": "Workspace", "type": "Link", "icon": "home", "idx": 0})
-        sb.append("items", {"label": "Painel de Planejamento MRP", "link_to": "mrp-workbench", "link_type": "Page", "type": "Link", "icon": "project", "idx": 1})
+        sb.append("items", {"label": "Painel de Planejamento MRP", "link_to": "mrp_workbench", "link_type": "Page", "type": "Link", "icon": "project", "idx": 1})
         sb.append("items", {"label": "Tickets de Cálculo (MRP)", "link_to": "MRP Ticket", "link_type": "DocType", "type": "Link", "icon": "getting-started", "idx": 2})
         sb.append("items", {"label": "Resultados e Consultas", "type": "Section Break", "icon": "list-tree", "idx": 3})
         sb.append("items", {"label": "Sugestões de Abastecimento", "link_to": "MRP Result", "link_type": "DocType", "type": "Link", "child": 1, "icon": "clipboard-check", "idx": 4})
@@ -170,11 +170,11 @@ def setup_mrp_desktop_and_sidebar():
                 l.link_type = ""
                 l.link_to = ""
             elif l.link_to in ("mrp_workbench", "mrp-workbench"):
-                l.link_to = "mrp-workbench"
+                l.link_to = "mrp_workbench"
                 l.link_type = "Page"
         for s in ws.shortcuts:
             if s.link_to in ("mrp_workbench", "mrp-workbench"):
-                s.link_to = "mrp-workbench"
+                s.link_to = "mrp_workbench"
                 
         content_blocks = [
             {"id": "h_shortcuts", "type": "header", "data": {"text": "<span class=\"h4\"><b>Atalhos Rápidos</b></span>", "col": 12}},

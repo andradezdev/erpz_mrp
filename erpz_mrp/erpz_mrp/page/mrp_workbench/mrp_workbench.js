@@ -178,8 +178,11 @@ class MRPWorkbench {
 									</select>
 								</div>
 								<div class="ml-auto d-flex gap-2">
+									<button class="btn btn-sm btn-primary" id="btn-import-demand">
+										<i class="octicon octicon-upload"></i> Importar Demanda (Excel)
+									</button>
 									<button class="btn btn-sm btn-default" id="btn-export-excel">
-										<i class="octicon octicon-file"></i> Exportar Dados
+										<i class="octicon octicon-file"></i> Exportar Excel
 									</button>
 								</div>
 							</div>
@@ -313,7 +316,12 @@ class MRPWorkbench {
 			me.render_timeline_chart();
 		});
 
-		// Export CSV/Excel
+		// Import Excel button
+		this.$container.find("#btn-import-demand").on("click", function() {
+			me.show_import_demand_dialog();
+		});
+
+		// Export Excel
 		this.$container.find("#btn-export-excel").on("click", function() {
 			me.export_summary_data();
 		});
@@ -783,12 +791,69 @@ class MRPWorkbench {
 		});
 	}
 
+	show_import_demand_dialog() {
+		const me = this;
+		if (!this.current_ticket) {
+			frappe.msgprint(__("Selecione um Ticket MRP primeiro."));
+			return;
+		}
+
+		let d = new frappe.ui.Dialog({
+			title: __("Importar Demanda Manual (Excel)"),
+			fields: [
+				{
+					fieldtype: "HTML",
+					fieldname: "instructions",
+					options: `
+						<div class="alert alert-info small mb-3">
+							<b>Instruções de Importação:</b><br>
+							Baixe o modelo padrão em Excel, preencha as colunas e faça o upload do arquivo. As demandas serão incorporadas como <b>Demanda Manual</b> neste Ticket.
+							<div class="mt-2">
+								<a href="/api/method/erpz_mrp.api.download_manual_demand_template" class="btn btn-xs btn-primary" target="_blank">
+									<i class="octicon octicon-cloud-download"></i> Baixar Modelo Excel (.xlsx)
+								</a>
+							</div>
+						</div>
+					`
+				},
+				{
+					label: __("Arquivo Excel (.xlsx)"),
+					fieldname: "excel_file",
+					fieldtype: "Attach",
+					reqd: 1
+				}
+			],
+			primary_action_label: __("Importar e Processar"),
+			primary_action(values) {
+				d.hide();
+				frappe.show_alert({ message: __("Importando demandas manuais..."), indicator: "blue" });
+				frappe.call({
+					method: "erpz_mrp.api.import_manual_demands",
+					args: {
+						ticket_name: me.current_ticket,
+						file_url: values.excel_file
+					},
+					freeze: true,
+					freeze_message: __("Processando arquivo Excel e inserindo demandas..."),
+					callback: function(r) {
+						if (r.message && r.message.success) {
+							frappe.msgprint({
+								title: __("Importação Concluída"),
+								indicator: "green",
+								message: __("Foram importadas {0} linhas de demanda manual com sucesso!<br>Clique em <b>Calcular MRP</b> para recalcular o planejamento com estas demandas.", [r.message.imported_count])
+							});
+							me.reload_all();
+						}
+					}
+				});
+			}
+		});
+		d.show();
+	}
+
 	export_summary_data() {
 		const me = this;
-		frappe.tools.downloadify(
-			Array.from($("#mrp-summary-table tr")).map(row => Array.from(row.querySelectorAll("th, td")).map(cell => cell.innerText.trim())),
-			null,
-			`MRP_${me.current_ticket}_Resumo`
-		);
+		if (!this.current_ticket) return;
+		window.open(`/api/method/erpz_mrp.api.export_mrp_excel?ticket_name=${me.current_ticket}`);
 	}
 }

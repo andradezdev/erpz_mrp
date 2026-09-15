@@ -25,7 +25,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Painel de Planejamento MRP",
-   "link_to": "mrp-workbench",
+   "link_to": "mrp_workbench",
    "link_type": "Page",
    "show_arrow": 0,
    "type": "Link"
@@ -161,7 +161,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-09-12 23:00:13.654900",
+ "modified": "2026-09-15 12:14:28.202948",
  "modified_by": "Administrator",
  "module": "ERPZ MRP",
  "name": "ERPZ MRP",

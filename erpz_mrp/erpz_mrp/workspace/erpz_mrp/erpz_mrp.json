@@ -1,8 +1,8 @@
 {
- "app": "erpz_mrp",
+ "category": "Modules",
  "charts": [],
- "content": "[{\"id\": \"h_shortcuts\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Atalhos R\\u00e1pidos</b></span>\", \"col\": 12}}, {\"id\": \"sc_workbench\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Painel de Planejamento\", \"col\": 4}}, {\"id\": \"sc_ticket\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Tickets de C\\u00e1lculo\", \"col\": 4}}, {\"id\": \"sc_result\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sugest\\u00f5es de Abastecimento\", \"col\": 4}}, {\"id\": \"spacer_1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"h_cards\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>M\\u00f3dulos e Consultas</b></span>\", \"col\": 12}}, {\"id\": \"card_ops\", \"type\": \"card\", \"data\": {\"card_name\": \"Central e Opera\\u00e7\\u00f5es\", \"col\": 4}}, {\"id\": \"card_res\", \"type\": \"card\", \"data\": {\"card_name\": \"Resultados e Consultas\", \"col\": 4}}, {\"id\": \"card_param\", \"type\": \"card\", \"data\": {\"card_name\": \"Cadastros e Par\\u00e2metros\", \"col\": 4}}]",
- "creation": "2026-09-12 20:00:00",
+ "content": "[{\"id\":\"h_shortcuts\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Atalhos Rápidos</b></span>\",\"col\":12}},{\"id\":\"sc_workbench\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Painel de Planejamento\",\"col\":4}},{\"id\":\"sc_ticket\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tickets de Cálculo\",\"col\":4}},{\"id\":\"sc_result\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sugestões de Abastecimento\",\"col\":4}},{\"id\":\"spacer_1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"h_cards\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Módulos e Consultas</b></span>\",\"col\":12}},{\"id\":\"card_ops\",\"type\":\"card\",\"data\":{\"card_name\":\"Central e Operações\",\"col\":4}},{\"id\":\"card_res\",\"type\":\"card\",\"data\":{\"card_name\":\"Resultados e Consultas\",\"col\":4}},{\"id\":\"card_param\",\"type\":\"card\",\"data\":{\"card_name\":\"Cadastros e Parâmetros\",\"col\":4}}]",
+ "creation": "2026-09-12 20:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
@@ -17,10 +17,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Central e Opera\u00e7\u00f5es",
+   "label": "Central e Operações",
    "link_count": 0,
-   "link_to": "",
-   "link_type": "",
+    "link_type": null,
    "onboard": 0,
    "type": "Card Break"
   },
@@ -29,7 +28,7 @@
    "is_query_report": 0,
    "label": "Painel de Planejamento MRP",
    "link_count": 0,
-   "link_to": "mrp-workbench",
+   "link_to": "mrp_workbench",
    "link_type": "Page",
    "onboard": 1,
    "type": "Link"
@@ -37,7 +36,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Tickets de C\u00e1lculo (Cen\u00e1rios)",
+   "label": "Tickets de Cálculo (Cenários)",
    "link_count": 0,
    "link_to": "MRP Ticket",
    "link_type": "DocType",
@@ -49,15 +48,14 @@
    "is_query_report": 0,
    "label": "Resultados e Consultas",
    "link_count": 0,
-   "link_to": "",
-   "link_type": "",
+    "link_type": null,
    "onboard": 0,
    "type": "Card Break"
   },
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Necessidades e Sugest\u00f5es",
+   "label": "Necessidades e Sugestões",
    "link_count": 0,
    "link_to": "MRP Result",
    "link_type": "DocType",
@@ -107,17 +105,16 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Cadastros e Par\u00e2metros",
+   "label": "Cadastros e Parâmetros",
    "link_count": 0,
-   "link_to": "",
-   "link_type": "",
+    "link_type": null,
    "onboard": 0,
    "type": "Card Break"
   },
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Par\u00e2metros do MRP",
+   "label": "Parâmetros do MRP",
    "link_count": 0,
    "link_to": "MRP Settings",
    "link_type": "DocType",
@@ -145,11 +142,10 @@
    "type": "Link"
   }
  ],
- "modified": "2026-09-12 23:00:14.493866",
+ "modified": "2026-09-12 20:00:00.000000",
  "modified_by": "Administrator",
  "module": "ERPZ MRP",
  "name": "ERPZ MRP",
- "number_cards": [],
  "owner": "Administrator",
  "parent_page": "",
  "public": 1,
@@ -162,7 +158,7 @@
    "doc_view": "List",
    "format": "Painel MRP",
    "label": "Painel de Planejamento",
-   "link_to": "mrp-workbench",
+   "link_to": "mrp_workbench",
    "stats_filter": "[]",
    "type": "Page"
   },
@@ -170,7 +166,7 @@
    "color": "Grey",
    "doc_view": "List",
    "format": "{} Tickets",
-   "label": "Tickets de C\u00e1lculo",
+   "label": "Tickets de Cálculo",
    "link_to": "MRP Ticket",
    "stats_filter": "[]",
    "type": "DocType"
@@ -178,8 +174,8 @@
   {
    "color": "Green",
    "doc_view": "List",
-   "format": "{} Sugest\u00f5es",
-   "label": "Sugest\u00f5es de Abastecimento",
+   "format": "{} Sugestões",
+   "label": "Sugestões de Abastecimento",
    "link_to": "MRP Result",
    "stats_filter": "[]",
    "type": "DocType"
