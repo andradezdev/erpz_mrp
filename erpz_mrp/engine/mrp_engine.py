@@ -264,10 +264,21 @@ class MRPEngine:
             conditions.append("item_group = %s")
             values.append(self.ticket.item_group_filter)
             
+        extra_cols = ""
+        if frappe.db.has_column("Item", "custom_mrp_min_stock"):
+            extra_cols += ", custom_mrp_min_stock"
+        if frappe.db.has_column("Item", "custom_mrp_reorder_point"):
+            extra_cols += ", custom_mrp_reorder_point"
+        if frappe.db.has_column("Item", "custom_mrp_safety_stock"):
+            extra_cols += ", custom_mrp_safety_stock"
+        if frappe.db.has_column("Item", "custom_mrp_total_safety_threshold"):
+            extra_cols += ", custom_mrp_total_safety_threshold"
+
         sql = f"""
             SELECT name, item_name, description, stock_uom, item_group,
                    is_stock_item, is_purchase_item, is_sub_contracted_item,
                    min_order_qty, safety_stock, lead_time_days, default_bom
+                   {extra_cols}
             FROM `tabItem`
             WHERE {" AND ".join(conditions)}
         """
@@ -505,7 +516,14 @@ class MRPEngine:
 
     def process_item_timeline(self, item_code, item_demands, pending_demands_queue, current_level):
         item_meta = self.items_meta.get(item_code, {})
-        safety_stock = flt(item_meta.get("safety_stock", 0.0)) if self.ticket.consider_safety_stock else 0.0
+        min_stock = flt(item_meta.get("custom_mrp_min_stock") or 0.0)
+        reorder_point = flt(item_meta.get("custom_mrp_reorder_point") or 0.0)
+        safety_stock_val = flt(item_meta.get("custom_mrp_safety_stock") or item_meta.get("safety_stock") or 0.0)
+        critical_safety_threshold = reorder_point + safety_stock_val
+        effective_safety_target = max(min_stock, critical_safety_threshold)
+        if effective_safety_target <= 0 and self.ticket.consider_safety_stock:
+            effective_safety_target = safety_stock_val
+
         lead_time = cint(item_meta.get("lead_time_days", 0))
         min_order_qty = flt(item_meta.get("min_order_qty", 0.0))
         
@@ -552,21 +570,34 @@ class MRPEngine:
             day_initial_balance = running_balance
             projected = day_initial_balance + day_inflows - day_outflows
             
+            has_shortage = False
+            shortage_type = "Normal"
             shortage = 0.0
             suggested_inflow = 0.0
             
-            # Check Shortage against Safety Stock
-            if projected < safety_stock:
-                shortage = safety_stock - projected
-                
-                # Apply Lot Sizing rules
+            # Check Rupturas e Níveis Críticos
+            if projected < 0:
+                has_shortage = True
+                shortage_type = "Ruptura Total (Saldo Negativo)"
+                shortage = (effective_safety_target - projected) if effective_safety_target > 0 else abs(projected)
+            elif min_stock > 0 and projected <= min_stock:
+                has_shortage = True
+                shortage_type = "Abaixo do Estoque Mínimo"
+                shortage = max(min_stock, effective_safety_target) - projected
+            elif critical_safety_threshold > 0 and projected <= critical_safety_threshold:
+                has_shortage = True
+                shortage_type = "Abaixo do Ponto de Pedido + Segurança"
+                shortage = critical_safety_threshold - projected
+            elif self.ticket.consider_safety_stock and safety_stock_val > 0 and projected < safety_stock_val:
+                has_shortage = True
+                shortage_type = "Abaixo do Estoque de Segurança"
+                shortage = safety_stock_val - projected
+
+            if has_shortage:
                 suggested_qty = self.apply_lot_sizing(item_code, shortage)
                 suggested_inflow = suggested_qty
-                
-                # Bring running balance back
                 running_balance = projected + suggested_inflow
                 
-                # Determine Supply Policy (Produzir, Comprar, Transferir)
                 self.handle_shortage_suggestion(
                     item_code=item_code,
                     need_date=cur_date,
@@ -580,7 +611,11 @@ class MRPEngine:
                     initial_stock=day_initial_balance,
                     planned_inflows=day_inflows,
                     projected_balance=projected,
-                    safety_stock=safety_stock
+                    safety_stock=safety_stock_val,
+                    min_stock=min_stock,
+                    reorder_point=reorder_point,
+                    critical_threshold=critical_safety_threshold,
+                    shortage_type=shortage_type
                 )
             else:
                 running_balance = projected
@@ -597,15 +632,20 @@ class MRPEngine:
                 "inflows": day_inflows,
                 "outflows": day_outflows,
                 "projected_balance": projected,
-                "safety_stock": safety_stock,
+                "safety_stock": safety_stock_val,
+                "min_stock": min_stock,
+                "reorder_point": reorder_point,
+                "critical_threshold": critical_safety_threshold,
                 "shortage_qty": shortage,
                 "suggested_inflow": suggested_inflow,
-                "has_shortage": 1 if shortage > 0 else 0
+                "has_shortage": 1 if has_shortage else 0,
+                "shortage_type": shortage_type if has_shortage else ""
             })
 
     def handle_shortage_suggestion(self, item_code, need_date, gross_demand, net_qty, suggested_qty,
                                    day_dem_list, lead_time, current_level, pending_demands_queue,
-                                   initial_stock, planned_inflows, projected_balance, safety_stock):
+                                   initial_stock, planned_inflows, projected_balance, safety_stock,
+                                   min_stock=0.0, reorder_point=0.0, critical_threshold=0.0, shortage_type="Normal"):
         item_meta = self.items_meta.get(item_code, {})
         company = self.ticket.company
         primary_wh = self.stock_cache.get_primary_warehouse(item_code, company)
@@ -646,7 +686,12 @@ class MRPEngine:
             if bom:
                 supply_type = "Produção"
                 bom_no = bom.name
-                situation = "Demanda de Pedido / Necessidade Líquida" if gross_demand > 0 else "Manutenção do Estoque de Segurança"
+                if shortage_type and shortage_type != "Normal":
+                    situation = f"{shortage_type} (Mín: {min_stock}, Gatilho: {critical_threshold})"
+                elif gross_demand > 0:
+                    situation = "Demanda de Pedido / Necessidade Líquida"
+                else:
+                    situation = "Manutenção dos Níveis de Segurança"
             else:
                 # When item has NO valid BOM -> Automatically generate Purchase (Compra) via ERPNext Buying API
                 supply_type = "Compra"
@@ -654,6 +699,8 @@ class MRPEngine:
                 if not item_meta.get("is_purchase_item") and item_meta.get("is_stock_item"):
                     situation = "Item sem estrutura (BOM) ativa -> Sugestão de Compra"
                     self.log("Sem Estrutura", f"Item {item_code} não possui BOM padrão ativa. Gerada sugestão de Compra no ERPNext.", item_code=item_code)
+                elif shortage_type and shortage_type != "Normal":
+                    situation = f"{shortage_type} (Mín: {min_stock}, Gatilho: {critical_threshold})"
                 else:
                     situation = "Item de Compra / Matéria-prima"
                 
@@ -666,7 +713,6 @@ class MRPEngine:
             )
             from_company = None
             from_warehouse = None
-            situation = "Demanda de Pedido / Necessidade Líquida" if gross_demand > 0 else "Manutenção do Estoque de Segurança"
             
         # Origin details
         origin_doc = day_dem_list[0] if day_dem_list else {}
@@ -691,6 +737,10 @@ class MRPEngine:
             "planned_inflows": planned_inflows,
             "projected_balance": projected_balance,
             "safety_stock": safety_stock,
+            "min_stock": min_stock,
+            "reorder_point": reorder_point,
+            "critical_threshold": critical_threshold,
+            "shortage_type": shortage_type,
             "net_requirement": net_qty,
             "suggested_qty": suggested_qty,
             "min_order_qty": flt(item_meta.get("min_order_qty", 0.0)),
@@ -794,6 +844,7 @@ class MRPEngine:
             cols = [
                 "name", "mrp_ticket", "item_code", "item_name", "company", "warehouse", "need_date", "supply_date",
                 "gross_demand", "initial_stock", "planned_inflows", "projected_balance", "safety_stock",
+                "min_stock", "reorder_point", "critical_threshold", "shortage_type",
                 "net_requirement", "suggested_qty", "min_order_qty", "lot_multiple", "economic_order_qty",
                 "supply_type", "origin_item", "origin_doctype", "origin_name", "origin_date", "bom_no",
                 "bom_level", "lead_time_days", "from_company", "from_warehouse", "status", "situation",
@@ -805,6 +856,7 @@ class MRPEngine:
                     frappe.generate_hash(length=12), self.ticket_name, r["item_code"], r.get("item_name"), r["company"], r.get("warehouse"),
                     r["need_date"], r["supply_date"], flt(r.get("gross_demand")), flt(r.get("initial_stock")),
                     flt(r.get("planned_inflows")), flt(r.get("projected_balance")), flt(r.get("safety_stock")),
+                    flt(r.get("min_stock")), flt(r.get("reorder_point")), flt(r.get("critical_threshold")), r.get("shortage_type", ""),
                     flt(r.get("net_requirement")), flt(r.get("suggested_qty")), flt(r.get("min_order_qty")),
                     flt(r.get("lot_multiple")), flt(r.get("economic_order_qty")), r["supply_type"],
                     r.get("origin_item"), r.get("origin_doctype"), r.get("origin_name"), r.get("origin_date"),
@@ -819,6 +871,7 @@ class MRPEngine:
             t_cols = [
                 "name", "mrp_ticket", "item_code", "item_name", "company", "warehouse", "timeline_date",
                 "initial_balance", "inflows", "outflows", "projected_balance", "safety_stock",
+                "min_stock", "reorder_point", "critical_threshold", "shortage_type",
                 "shortage_qty", "suggested_inflow", "has_shortage"
             ]
             t_rows = []
@@ -826,7 +879,9 @@ class MRPEngine:
                 t_rows.append([
                     frappe.generate_hash(length=12), self.ticket_name, t["item_code"], t.get("item_name"), t["company"], t.get("warehouse"),
                     t["timeline_date"], flt(t.get("initial_balance")), flt(t.get("inflows")), flt(t.get("outflows")),
-                    flt(t.get("projected_balance")), flt(t.get("safety_stock")), flt(t.get("shortage_qty")),
+                    flt(t.get("projected_balance")), flt(t.get("safety_stock")),
+                    flt(t.get("min_stock")), flt(t.get("reorder_point")), flt(t.get("critical_threshold")), t.get("shortage_type", ""),
+                    flt(t.get("shortage_qty")),
                     flt(t.get("suggested_inflow")), cint(t.get("has_shortage"))
                 ])
             frappe.db.bulk_insert("MRP Timeline", t_cols, t_rows)

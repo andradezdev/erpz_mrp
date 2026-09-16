@@ -66,6 +66,51 @@ def setup_mrp_custom_fields():
                 "insert_after": "custom_mrp_ticket",
                 "read_only": 1
             }
+        ],
+        "Item": [
+            {
+                "fieldname": "mrp_stock_section",
+                "label": "Parâmetros de Estoque e Segurança (MRP)",
+                "fieldtype": "Section Break",
+                "insert_after": "safety_stock"
+            },
+            {
+                "fieldname": "custom_mrp_min_stock",
+                "label": "Estoque Mínimo a Manter (MRP)",
+                "fieldtype": "Float",
+                "default": "0.0",
+                "insert_after": "mrp_stock_section",
+                "description": "Estoque mínimo obrigatório no armazém. Ao atingir ou ficar menor, o MRP gera produção ou compra."
+            },
+            {
+                "fieldname": "custom_mrp_reorder_point",
+                "label": "Ponto de Pedido (MRP)",
+                "fieldtype": "Float",
+                "default": "0.0",
+                "insert_after": "custom_mrp_min_stock",
+                "description": "Gatilho de reposição do MRP."
+            },
+            {
+                "fieldname": "col_break_mrp_stock",
+                "fieldtype": "Column Break",
+                "insert_after": "custom_mrp_reorder_point"
+            },
+            {
+                "fieldname": "custom_mrp_safety_stock",
+                "label": "Estoque de Segurança (MRP)",
+                "fieldtype": "Float",
+                "default": "0.0",
+                "insert_after": "col_break_mrp_stock",
+                "description": "Margem de segurança adicional somada ao ponto de pedido."
+            },
+            {
+                "fieldname": "custom_mrp_total_safety_threshold",
+                "label": "Gatilho Crítico (Ponto de Pedido + Segurança)",
+                "fieldtype": "Float",
+                "read_only": 1,
+                "insert_after": "custom_mrp_safety_stock",
+                "description": "Ponto de Pedido + Estoque de Segurança calculado automaticamente."
+            }
         ]
     }
     

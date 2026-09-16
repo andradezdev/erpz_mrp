@@ -36,7 +36,11 @@
   "is_aglutinated",
   "aglutinated_items_count",
   "generated_doctype",
-  "generated_docname"
+  "generated_docname",
+  "min_stock",
+  "reorder_point",
+  "critical_threshold",
+  "shortage_type"
  ],
  "fields": [
   {
@@ -250,6 +254,29 @@
    "fieldname": "generated_docname",
    "fieldtype": "Data",
    "label": "Documento Gerado"
+  },
+  {
+   "fieldname": "min_stock",
+   "fieldtype": "Float",
+   "label": "Estoque Mínimo",
+   "default": "0"
+  },
+  {
+   "fieldname": "reorder_point",
+   "fieldtype": "Float",
+   "label": "Ponto de Pedido",
+   "default": "0"
+  },
+  {
+   "fieldname": "critical_threshold",
+   "fieldtype": "Float",
+   "label": "Gatilho Crítico (PP + Seg)",
+   "default": "0"
+  },
+  {
+   "fieldname": "shortage_type",
+   "fieldtype": "Data",
+   "label": "Tipo de Ruptura"
   }
  ],
  "links": [],

@@ -232,9 +232,10 @@ class MRPWorkbench {
 											<th>Entradas (Previstas + Sugeridas)</th>
 											<th>Saídas (Demandas)</th>
 											<th>Saldo Projetado</th>
-											<th>Estoque Segurança</th>
+											<th>Estoque Mínimo</th>
+											<th>Ponto Pedido + Seg</th>
 											<th>Falta / Ruptura</th>
-											<th>Status do Dia</th>
+											<th>Situação</th>
 										</tr>
 									</thead>
 									<tbody id="mrp-timeline-tbody"></tbody>
@@ -559,7 +560,8 @@ class MRPWorkbench {
 						labels: data.dates.map(d => frappe.datetime.str_to_user(d)),
 						datasets: [
 							{ name: "Saldo Projetado", values: data.projected_balance, chartType: "line" },
-							{ name: "Estoque de Segurança", values: data.safety_stock, chartType: "line" },
+							{ name: "Estoque Mínimo", values: data.min_stock || [], chartType: "line" },
+							{ name: "Ponto Pedido + Seg", values: data.critical_threshold || [], chartType: "line" },
 							{ name: "Entradas Totais", values: data.inflows, chartType: "bar" },
 							{ name: "Demandas / Saídas", values: data.outflows, chartType: "bar" }
 						]
@@ -573,15 +575,17 @@ class MRPWorkbench {
 						data: chartData,
 						type: "axis-mixed",
 						height: 280,
-						colors: ["#2490ef", "#ed8936", "#38a169", "#e53e3e"]
+						colors: ["#2490ef", "#e53e3e", "#ed8936", "#38a169", "#718096"]
 					});
 
 					// Render Table rows
 					const tbody = $("#mrp-timeline-tbody").empty();
 					data.raw_rows.forEach(rw => {
-						const shortageBadge = rw.has_shortage ?
-							`<span class="badge badge-danger">Ruptura (${rw.shortage_qty})</span>` :
-							`<span class="badge badge-success">OK</span>`;
+						let shortageBadge = `<span class="badge badge-success">Normal</span>`;
+						if (rw.has_shortage) {
+							const typeText = rw.shortage_type || "Ruptura";
+							shortageBadge = `<span class="badge badge-danger" title="Déficit: ${rw.shortage_qty}">${typeText}</span>`;
+						}
 
 						tbody.append(`
 							<tr>
@@ -591,8 +595,9 @@ class MRPWorkbench {
 								<td>${rw.inflows + rw.suggested_inflow}</td>
 								<td>${rw.outflows}</td>
 								<td class="${rw.has_shortage ? 'text-danger font-weight-bold' : ''}">${rw.projected_balance}</td>
-								<td>${rw.safety_stock}</td>
-								<td>${rw.shortage_qty}</td>
+								<td>${rw.min_stock || 0}</td>
+								<td>${rw.critical_threshold || rw.safety_stock || 0}</td>
+								<td>${rw.shortage_qty > 0 ? rw.shortage_qty : '-'}</td>
 								<td>${shortageBadge}</td>
 							</tr>
 						`);

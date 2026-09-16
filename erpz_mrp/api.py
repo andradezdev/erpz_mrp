@@ -81,6 +81,7 @@ def get_mrp_summary(ticket_name, company=None, item_code=None, supply_type=None,
             "name", "item_code", "item_name", "company", "warehouse",
             "need_date", "supply_date", "gross_demand", "initial_stock",
             "planned_inflows", "projected_balance", "safety_stock",
+            "min_stock", "reorder_point", "critical_threshold", "shortage_type",
             "net_requirement", "suggested_qty", "supply_type",
             "origin_item", "origin_doctype", "origin_name", "bom_no",
             "bom_level", "lead_time_days", "from_company", "from_warehouse",
@@ -111,7 +112,8 @@ def get_timeline_data(ticket_name, item_code=None, company=None):
         fields=[
             "item_code", "item_name", "company", "timeline_date",
             "initial_balance", "inflows", "outflows", "projected_balance",
-            "safety_stock", "shortage_qty", "suggested_inflow", "has_shortage"
+            "safety_stock", "min_stock", "reorder_point", "critical_threshold",
+            "shortage_qty", "suggested_inflow", "has_shortage", "shortage_type"
         ],
         order_by="timeline_date ASC"
     )
@@ -119,6 +121,8 @@ def get_timeline_data(ticket_name, item_code=None, company=None):
     dates = []
     projected = []
     safety = []
+    min_stocks = []
+    critical_thresholds = []
     shortages = []
     inflows = []
     outflows = []
@@ -128,6 +132,8 @@ def get_timeline_data(ticket_name, item_code=None, company=None):
         dates.append(d_str)
         projected.append(r.projected_balance)
         safety.append(r.safety_stock)
+        min_stocks.append(r.get("min_stock", 0.0))
+        critical_thresholds.append(r.get("critical_threshold", 0.0))
         shortages.append(r.shortage_qty)
         inflows.append(r.inflows + r.suggested_inflow)
         outflows.append(r.outflows)
@@ -136,6 +142,8 @@ def get_timeline_data(ticket_name, item_code=None, company=None):
         "dates": dates,
         "projected_balance": projected,
         "safety_stock": safety,
+        "min_stock": min_stocks,
+        "critical_threshold": critical_thresholds,
         "shortage_qty": shortages,
         "inflows": inflows,
         "outflows": outflows,
@@ -460,7 +468,8 @@ def export_mrp_excel(ticket_name):
         fields=[
             "item_code", "item_name", "company", "warehouse", "need_date",
             "supply_date", "gross_demand", "initial_stock", "planned_inflows",
-            "projected_balance", "safety_stock", "net_requirement", "suggested_qty",
+            "projected_balance", "safety_stock", "min_stock", "reorder_point",
+            "critical_threshold", "shortage_type", "net_requirement", "suggested_qty",
             "min_order_qty", "supply_type", "origin_item", "origin_name",
             "generated_docname", "status", "situation"
         ],
@@ -471,7 +480,8 @@ def export_mrp_excel(ticket_name):
     headers1 = [
         "Código Item", "Descrição do Produto", "Empresa", "Depósito", "Data Necessidade",
         "Data Início", "Demanda Bruta", "Estoque Inicial", "Entradas Previstas",
-        "Saldo Projetado", "Estoque Segurança", "Necessidade Líquida", "Qtd Sugerida",
+        "Saldo Projetado", "Estoque Mínimo", "Ponto de Pedido", "Estoque Segurança",
+        "Gatilho Crítico (PP+Seg)", "Tipo de Ruptura", "Necessidade Líquida", "Qtd Sugerida",
         "Lote Mínimo", "Tipo Abastecimento", "Produto Originador", "Origem / Demanda",
         "Doc Gerado (OP/OC)", "Situação / Motivo"
     ]
@@ -482,8 +492,9 @@ def export_mrp_excel(ticket_name):
             str(r.need_date) if r.need_date else "",
             str(r.supply_date) if r.supply_date else "",
             flt(r.gross_demand), flt(r.initial_stock), flt(r.planned_inflows),
-            flt(r.projected_balance), flt(r.safety_stock), flt(r.net_requirement),
-            flt(r.suggested_qty), flt(r.min_order_qty), r.supply_type,
+            flt(r.projected_balance), flt(r.min_stock), flt(r.reorder_point),
+            flt(r.safety_stock), flt(r.critical_threshold), r.shortage_type or "Normal",
+            flt(r.net_requirement), flt(r.suggested_qty), flt(r.min_order_qty), r.supply_type,
             r.origin_item or "", r.origin_name or "", r.generated_docname or "Pendente",
             r.situation or ""
         ])
@@ -497,6 +508,7 @@ def export_mrp_excel(ticket_name):
         fields=[
             "timeline_date", "item_code", "item_name", "company", "initial_balance",
             "inflows", "outflows", "projected_balance", "safety_stock",
+            "min_stock", "reorder_point", "critical_threshold", "shortage_type",
             "shortage_qty", "suggested_inflow", "has_shortage"
         ],
         order_by="timeline_date ASC, item_code ASC"
@@ -504,17 +516,19 @@ def export_mrp_excel(ticket_name):
     title2 = f"ERPZ MRP — Linha do Tempo Cronológica do Saldo Projetado | Ticket: {ticket_name}"
     headers2 = [
         "Data", "Código Item", "Descrição", "Empresa", "Saldo Inicial",
-        "Entradas Totais", "Saídas (Demandas)", "Saldo Projetado", "Estoque Segurança",
-        "Insuficiência / Falta", "Entrada Sugerida", "Ruptura"
+        "Entradas Totais", "Saídas (Demandas)", "Saldo Projetado",
+        "Estoque Mínimo", "Ponto Pedido + Seg", "Estoque Segurança",
+        "Insuficiência / Falta", "Entrada Sugerida", "Situação de Ruptura"
     ]
     rows2 = []
     for t in timelines:
         rows2.append([
             str(t.timeline_date), t.item_code, t.item_name, t.company,
             flt(t.initial_balance), flt(t.inflows + t.suggested_inflow),
-            flt(t.outflows), flt(t.projected_balance), flt(t.safety_stock),
+            flt(t.outflows), flt(t.projected_balance),
+            flt(t.min_stock), flt(t.critical_threshold), flt(t.safety_stock),
             flt(t.shortage_qty), flt(t.suggested_inflow),
-            "SIM (Ruptura)" if t.has_shortage else "OK"
+            t.shortage_type if t.has_shortage else "OK"
         ])
     style_excel_sheet(ws2, title2, headers2, rows2, header_color="2B6CB0")
 
