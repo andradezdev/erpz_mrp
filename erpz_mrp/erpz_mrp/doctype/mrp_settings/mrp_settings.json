@@ -1,199 +1,199 @@
 {
- "actions": [],
- "creation": "2026-09-12 19:35:00.000000",
- "doctype": "DocType",
- "engine": "InnoDB",
- "field_order": [
-  "sec_general",
-  "default_horizon_days",
-  "default_periodicity",
-  "default_simulation",
-  "allow_multi_company",
-  "col_break_1",
-  "default_lead_time_days",
-  "missing_bom_action",
-  "missing_lead_time_action",
-  "sec_calendar",
-  "use_working_days",
-  "default_holiday_list",
-  "sec_aglutination",
-  "default_aglutinate",
-  "aglutination_periodicity",
-  "aglutinate_components",
-  "sec_supply",
-  "purchase_doc_type",
-  "transfer_doc_type",
-  "auto_submit_work_order"
- ],
- "fields": [
-  {
-   "fieldname": "sec_general",
-   "fieldtype": "Section Break",
-   "label": "Parâmetros Gerais de Planejamento"
-  },
-  {
-   "fieldname": "default_horizon_days",
-   "fieldtype": "Int",
-   "label": "Horizonte Padrão (Dias)",
-   "default": "30"
-  },
-  {
-   "fieldname": "default_periodicity",
-   "fieldtype": "Select",
-   "label": "Periodicidade Padrão",
-   "options": "Diária\nSemanal\nQuinzenal\nMensal",
-   "default": "Diária"
-  },
-  {
-   "fieldname": "default_simulation",
-   "fieldtype": "Check",
-   "label": "Modo Simulação Padrão",
-   "default": "0"
-  },
-  {
-   "fieldname": "allow_multi_company",
-   "fieldtype": "Check",
-   "label": "Habilitar Multiempresa por Padrão",
-   "default": "1"
-  },
-  {
-   "fieldname": "col_break_1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "default_lead_time_days",
-   "fieldtype": "Int",
-   "label": "Lead Time Padrão (se não informado)",
-   "default": "0"
-  },
-  {
-   "fieldname": "missing_bom_action",
-   "fieldtype": "Select",
-   "label": "Ação quando item produzido não possui BOM",
-   "options": "Gerar Alerta\nBloquear Processamento",
-   "default": "Gerar Alerta"
-  },
-  {
-   "fieldname": "missing_lead_time_action",
-   "fieldtype": "Select",
-   "label": "Ação quando item não possui Lead Time",
-   "options": "Utilizar Lead Time Padrão\nGerar Alerta\nBloquear Processamento",
-   "default": "Utilizar Lead Time Padrão"
-  },
-  {
-   "fieldname": "sec_calendar",
-   "fieldtype": "Section Break",
-   "label": "Calendário e Dias Úteis"
-  },
-  {
-   "fieldname": "use_working_days",
-   "fieldtype": "Check",
-   "label": "Considerar Dias Úteis no Lead Time",
-   "default": "1"
-  },
-  {
-   "fieldname": "default_holiday_list",
-   "fieldtype": "Link",
-   "label": "Lista de Feriados Padrão",
-   "options": "Holiday List"
-  },
-  {
-   "fieldname": "sec_aglutination",
-   "fieldtype": "Section Break",
-   "label": "Regras de Aglutinação de Demandas"
-  },
-  {
-   "fieldname": "default_aglutinate",
-   "fieldtype": "Check",
-   "label": "Permitir Aglutinação de Ordens de Produção",
-   "default": "0"
-  },
-  {
-   "fieldname": "aglutination_periodicity",
-   "fieldtype": "Select",
-   "label": "Periodicidade de Aglutinação Padrão",
-   "options": "Diária\nSemanal\nQuinzenal\nMensal",
-   "default": "Semanal"
-  },
-  {
-   "fieldname": "aglutinate_components",
-   "fieldtype": "Check",
-   "label": "Aglutinar também Necessidades de Componentes (Compras)",
-   "default": "1"
-  },
-  {
-   "fieldname": "sec_supply",
-   "fieldtype": "Section Break",
-   "label": "Geração de Documentos de Abastecimento"
-  },
-  {
-   "fieldname": "purchase_doc_type",
-   "fieldtype": "Select",
-   "label": "Tipo de Documento para Compra",
-   "options": "Material Request\nPurchase Order",
-   "default": "Material Request"
-  },
-  {
-   "fieldname": "transfer_doc_type",
-   "fieldtype": "Select",
-   "label": "Tipo de Documento para Transferência",
-   "options": "Material Request\nStock Entry",
-   "default": "Material Request"
-  },
-  {
-   "fieldname": "auto_submit_work_order",
-   "fieldtype": "Check",
-   "label": "Submeter Ordens de Produção Geradas",
-   "default": "0"
-  }
- ],
- "links": [],
- "modified": "2026-09-12 19:35:00.000000",
- "modified_by": "Administrator",
- "module": "ERPZ MRP",
- "name": "MRP Settings",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Manufacturing Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 0,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Manufacturing User",
-   "share": 1,
-   "write": 1
-  }
- ],
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": [],
- "track_changes": 1,
- "issingle": 1
+    "actions": [],
+    "creation": "2026-09-12 19:35:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "sec_general",
+        "default_horizon_days",
+        "default_periodicity",
+        "default_simulation",
+        "allow_multi_company",
+        "col_break_1",
+        "default_lead_time_days",
+        "missing_bom_action",
+        "missing_lead_time_action",
+        "sec_calendar",
+        "use_working_days",
+        "default_holiday_list",
+        "sec_aglutination",
+        "default_aglutinate",
+        "aglutination_periodicity",
+        "aglutinate_components",
+        "sec_supply",
+        "purchase_doc_type",
+        "transfer_doc_type",
+        "auto_submit_work_order"
+    ],
+    "fields": [
+        {
+            "fieldname": "sec_general",
+            "fieldtype": "Section Break",
+            "label": "Parâmetros Gerais de Planejamento"
+        },
+        {
+            "fieldname": "default_horizon_days",
+            "fieldtype": "Int",
+            "label": "Horizonte Padrão (Dias)",
+            "default": "30"
+        },
+        {
+            "fieldname": "default_periodicity",
+            "fieldtype": "Select",
+            "label": "Periodicidade Padrão",
+            "options": "Não Aglutinar (Ordem a Ordem)\nDiária\nSemanal\nQuinzenal\nMensal",
+            "default": "Diária"
+        },
+        {
+            "fieldname": "default_simulation",
+            "fieldtype": "Check",
+            "label": "Modo Simulação Padrão",
+            "default": "0"
+        },
+        {
+            "fieldname": "allow_multi_company",
+            "fieldtype": "Check",
+            "label": "Habilitar Multiempresa por Padrão",
+            "default": "1"
+        },
+        {
+            "fieldname": "col_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "default_lead_time_days",
+            "fieldtype": "Int",
+            "label": "Lead Time Padrão (se não informado)",
+            "default": "0"
+        },
+        {
+            "fieldname": "missing_bom_action",
+            "fieldtype": "Select",
+            "label": "Ação quando item produzido não possui BOM",
+            "options": "Gerar Alerta\nBloquear Processamento",
+            "default": "Gerar Alerta"
+        },
+        {
+            "fieldname": "missing_lead_time_action",
+            "fieldtype": "Select",
+            "label": "Ação quando item não possui Lead Time",
+            "options": "Utilizar Lead Time Padrão\nGerar Alerta\nBloquear Processamento",
+            "default": "Utilizar Lead Time Padrão"
+        },
+        {
+            "fieldname": "sec_calendar",
+            "fieldtype": "Section Break",
+            "label": "Calendário e Dias Úteis"
+        },
+        {
+            "fieldname": "use_working_days",
+            "fieldtype": "Check",
+            "label": "Considerar Dias Úteis no Lead Time",
+            "default": "1"
+        },
+        {
+            "fieldname": "default_holiday_list",
+            "fieldtype": "Link",
+            "label": "Lista de Feriados Padrão",
+            "options": "Holiday List"
+        },
+        {
+            "fieldname": "sec_aglutination",
+            "fieldtype": "Section Break",
+            "label": "Regras de Aglutinação de Demandas"
+        },
+        {
+            "fieldname": "default_aglutinate",
+            "fieldtype": "Check",
+            "label": "Permitir Aglutinação de Ordens de Produção",
+            "default": "0"
+        },
+        {
+            "fieldname": "aglutination_periodicity",
+            "fieldtype": "Select",
+            "label": "Periodicidade de Aglutinação Padrão",
+            "options": "Não Aglutinar (Ordem a Ordem)\nDiária\nSemanal\nQuinzenal\nMensal",
+            "default": "Semanal"
+        },
+        {
+            "fieldname": "aglutinate_components",
+            "fieldtype": "Check",
+            "label": "Aglutinar também Necessidades de Componentes (Compras)",
+            "default": "1"
+        },
+        {
+            "fieldname": "sec_supply",
+            "fieldtype": "Section Break",
+            "label": "Geração de Documentos de Abastecimento"
+        },
+        {
+            "fieldname": "purchase_doc_type",
+            "fieldtype": "Select",
+            "label": "Tipo de Documento para Compra",
+            "options": "Material Request\nPurchase Order",
+            "default": "Material Request"
+        },
+        {
+            "fieldname": "transfer_doc_type",
+            "fieldtype": "Select",
+            "label": "Tipo de Documento para Transferência",
+            "options": "Material Request\nStock Entry",
+            "default": "Material Request"
+        },
+        {
+            "fieldname": "auto_submit_work_order",
+            "fieldtype": "Check",
+            "label": "Submeter Ordens de Produção Geradas",
+            "default": "0"
+        }
+    ],
+    "links": [],
+    "modified": "2026-09-12 19:35:00.000000",
+    "modified_by": "Administrator",
+    "module": "ERPZ MRP",
+    "name": "MRP Settings",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Manufacturing Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "delete": 0,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Manufacturing User",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1,
+    "issingle": 1
 }

@@ -99,25 +99,78 @@ def get_mrp_summary(ticket_name, company=None, item_code=None, supply_type=None,
 
 @frappe.whitelist()
 def get_timeline_data(ticket_name, item_code=None, company=None):
-    """Returns day-by-day projected balance and chart series for an item."""
-    filters = {"mrp_ticket": ticket_name}
+    """Returns day-by-day projected balance and chart series for an item or consolidated general view."""
     if item_code:
-        filters["item_code"] = item_code
-    if company:
-        filters["company"] = company
+        filters = {"mrp_ticket": ticket_name, "item_code": item_code}
+        if company:
+            filters["company"] = company
+            
+        rows = frappe.get_all(
+            "MRP Timeline",
+            filters=filters,
+            fields=[
+                "item_code", "item_name", "company", "timeline_date",
+                "initial_balance", "inflows", "outflows", "projected_balance",
+                "safety_stock", "min_stock", "reorder_point", "critical_threshold",
+                "shortage_qty", "suggested_inflow", "has_shortage", "shortage_type"
+            ],
+            order_by="timeline_date ASC"
+        )
         
-    rows = frappe.get_all(
-        "MRP Timeline",
-        filters=filters,
-        fields=[
-            "item_code", "item_name", "company", "timeline_date",
-            "initial_balance", "inflows", "outflows", "projected_balance",
-            "safety_stock", "min_stock", "reorder_point", "critical_threshold",
-            "shortage_qty", "suggested_inflow", "has_shortage", "shortage_type"
-        ],
-        order_by="timeline_date ASC"
-    )
-    
+        dates = []
+        projected = []
+        safety = []
+        min_stocks = []
+        critical_thresholds = []
+        shortages = []
+        inflows = []
+        outflows = []
+        
+        for r in rows:
+            dates.append(str(r.timeline_date))
+            projected.append(round(flt(r.projected_balance), 2))
+            safety.append(round(flt(r.safety_stock), 2))
+            min_stocks.append(round(flt(r.get("min_stock", 0.0)), 2))
+            critical_thresholds.append(round(flt(r.get("critical_threshold", 0.0)), 2))
+            shortages.append(round(flt(r.shortage_qty), 2))
+            inflows.append(round(flt(r.inflows) + flt(r.suggested_inflow), 2))
+            outflows.append(round(flt(r.outflows), 2))
+            
+        return {
+            "is_general": False,
+            "dates": dates,
+            "projected_balance": projected,
+            "safety_stock": safety,
+            "min_stock": min_stocks,
+            "critical_threshold": critical_thresholds,
+            "shortage_qty": shortages,
+            "inflows": inflows,
+            "outflows": outflows,
+            "raw_rows": rows
+        }
+
+    # Visão Geral Consolidada agrupada por data no banco de dados (evita sobrecarga do navegador)
+    company_cond = "AND company = %(company)s" if company else ""
+    params = {"ticket_name": ticket_name, "company": company}
+
+    agg_rows = frappe.db.sql(f"""
+        SELECT 
+            timeline_date,
+            SUM(initial_balance) as initial_balance,
+            SUM(inflows + suggested_inflow) as inflows,
+            SUM(outflows) as outflows,
+            SUM(projected_balance) as projected_balance,
+            SUM(safety_stock) as safety_stock,
+            SUM(min_stock) as min_stock,
+            SUM(critical_threshold) as critical_threshold,
+            SUM(shortage_qty) as shortage_qty,
+            MAX(has_shortage) as has_shortage
+        FROM `tabMRP Timeline`
+        WHERE mrp_ticket = %(ticket_name)s {company_cond}
+        GROUP BY timeline_date
+        ORDER BY timeline_date ASC
+    """, params, as_dict=True)
+
     dates = []
     projected = []
     safety = []
@@ -126,19 +179,33 @@ def get_timeline_data(ticket_name, item_code=None, company=None):
     shortages = []
     inflows = []
     outflows = []
-    
-    for r in rows:
-        d_str = str(r.timeline_date)
-        dates.append(d_str)
-        projected.append(r.projected_balance)
-        safety.append(r.safety_stock)
-        min_stocks.append(r.get("min_stock", 0.0))
-        critical_thresholds.append(r.get("critical_threshold", 0.0))
-        shortages.append(r.shortage_qty)
-        inflows.append(r.inflows + r.suggested_inflow)
-        outflows.append(r.outflows)
-        
+
+    for r in agg_rows:
+        dates.append(str(r.timeline_date))
+        projected.append(round(flt(r.projected_balance), 2))
+        safety.append(round(flt(r.safety_stock), 2))
+        min_stocks.append(round(flt(r.min_stock), 2))
+        critical_thresholds.append(round(flt(r.critical_threshold), 2))
+        shortages.append(round(flt(r.shortage_qty), 2))
+        inflows.append(round(flt(r.inflows), 2))
+        outflows.append(round(flt(r.outflows), 2))
+
+    # Tabela: principais ocorrências de ruptura ou movimentação relevante (limite de 250 linhas para fluidez)
+    table_rows = frappe.db.sql(f"""
+        SELECT 
+            item_code, item_name, company, timeline_date,
+            initial_balance, inflows, outflows, projected_balance,
+            safety_stock, min_stock, reorder_point, critical_threshold,
+            shortage_qty, suggested_inflow, has_shortage, shortage_type
+        FROM `tabMRP Timeline`
+        WHERE mrp_ticket = %(ticket_name)s {company_cond}
+          AND (has_shortage = 1 OR outflows > 0 OR inflows > 0 OR suggested_inflow > 0)
+        ORDER BY has_shortage DESC, shortage_qty DESC, timeline_date ASC
+        LIMIT 250
+    """, params, as_dict=True)
+
     return {
+        "is_general": True,
         "dates": dates,
         "projected_balance": projected,
         "safety_stock": safety,
@@ -147,22 +214,37 @@ def get_timeline_data(ticket_name, item_code=None, company=None):
         "shortage_qty": shortages,
         "inflows": inflows,
         "outflows": outflows,
-        "raw_rows": rows
+        "raw_rows": table_rows
     }
 
 @frappe.whitelist()
 def get_traceability_tree(ticket_name, root_demand=None):
     """
-    Builds a true hierarchical tree structure matching Sections 71, 72, 88, 92 of the MRP specification:
-    Level Root: Demand Document (ex: Pedido de Venda SAL-ORD-2026-00009)
-      └── Level 0: Produto Acabado (TEST-MRP-A) - Sugestão de Produção
-          ├── Level 1: Componente B (TEST-MRP-B) - Produção
-          └── Level 1: Componente C (TEST-MRP-C) - Transferência / Compra
+    Constrói a árvore de rastreabilidade hierárquica fiel multinível:
+    Nível Raiz: Pedido de Venda (ex: SAL-ORD-2026-00037)
+      └── Nível 0: Produto Acabado (YAM-1627) - Produção
+          ├── Nível 1: Subconjunto 805001627 - Produção
+          │    └── Nível 2: Subconjunto 820001627 - Produção
+          │         └── Nível 3: Subconjunto 825001627 - Produção
+          │              └── Nível 4: Subconjunto 830001627 - Produção
+          │                   └── Nível 5: Matéria-Prima 200220004 - Compra
+          ├── Nível 1: Subconjunto 805031409 - Produção
+          │    └── Nível 2: Subconjunto 805031032 - Produção
+          │         └── Nível 3: Subconjunto 810031032 - Produção
+          │              └── Nível 4: Subconjunto 815031024 - Produção
+          │                   └── Nível 5: Subconjunto 820031024 - Produção
+          │                        ├── Nível 6: Matéria-Prima 986400000 - Compra
+          │                        └── Nível 6: Matéria-Prima 200300009 - Compra
+          ├── Nível 1: Matéria-Prima 220100044 - Compra
+          ├── Nível 1: Matéria-Prima 220100021 - Compra
+          └── Nível 1: Matéria-Prima 220100005 - Compra
     """
     from collections import defaultdict
+    from frappe.utils import cint
+
     nodes = frappe.get_all(
         "MRP Traceability",
-        filters={"mrp_ticket": ticket_name},
+        filters={"mrp_ticket": ticket_name, "allocated_qty": [">", 0]},
         fields=[
             "name", "demand_source_doctype", "demand_source_name",
             "root_item", "parent_item", "child_item", "bom_level",
@@ -172,47 +254,113 @@ def get_traceability_tree(ticket_name, root_demand=None):
         ],
         order_by="bom_level ASC, need_date ASC"
     )
-    
-    # 1. Deduplicate nodes to avoid duplicate branches
-    unique_nodes = []
-    seen = set()
+
+    if not nodes:
+        nodes = frappe.get_all(
+            "MRP Traceability",
+            filters={"mrp_ticket": ticket_name},
+            fields=[
+                "name", "demand_source_doctype", "demand_source_name",
+                "root_item", "parent_item", "child_item", "bom_level",
+                "required_qty", "allocated_qty", "supply_type",
+                "from_company", "to_company", "need_date", "planned_start_date",
+                "target_doctype", "target_docname", "status"
+            ],
+            order_by="bom_level ASC, need_date ASC"
+        )
+
+    item_names_cache = {}
+    def get_item_name(code):
+        if not code:
+            return ""
+        if code not in item_names_cache:
+            item_names_cache[code] = frappe.db.get_value("Item", code, "item_name") or code
+        return item_names_cache[code]
+
+    children_by_parent = defaultdict(list)
+    root_nodes = []
+
     for n in nodes:
-        key = (n.demand_source_doctype, n.demand_source_name, n.parent_item, n.child_item, n.bom_level, flt(n.required_qty), n.supply_type)
-        if key not in seen:
-            seen.add(key)
-            node_dict = dict(n)
-            node_dict["item_name"] = frappe.db.get_value("Item", n.child_item, "item_name") or n.child_item
-            node_dict["children"] = []
-            unique_nodes.append(node_dict)
+        n_dict = dict(n)
+        n_dict["item_name"] = get_item_name(n.get("child_item"))
+        n_dict["children"] = []
 
-    # 2. Build tree by attaching Level 1 to Level 0, Level 2 to Level 1, etc.
-    level_0 = [n for n in unique_nodes if n["bom_level"] == 0]
-    
-    def attach_children(parent_node):
-        p_item = parent_node["child_item"]
-        p_level = parent_node["bom_level"]
-        for candidate in unique_nodes:
-            if candidate["bom_level"] == p_level + 1 and candidate.get("parent_item") == p_item:
-                candidate_copy = dict(candidate)
-                candidate_copy["children"] = []
-                attach_children(candidate_copy)
-                parent_node["children"].append(candidate_copy)
+        lvl = cint(n.get("bom_level", 0))
+        if lvl == 0:
+            root_nodes.append(n_dict)
+        else:
+            parent = None
+            if n.get("demand_source_name") and "Sugestão OP: " in n["demand_source_name"]:
+                parent = n["demand_source_name"].replace("Sugestão OP: ", "").strip()
+            elif n.get("parent_item") and n.get("parent_item") != n.get("root_item"):
+                parent = n.get("parent_item")
+            else:
+                parent = n.get("root_item")
+            children_by_parent[(parent, lvl)].append(n_dict)
 
-    # Group Level 0 by Demand Source (e.g. Sales Order)
-    demands_group = defaultdict(list)
-    for n0 in level_0:
-        attach_children(n0)
-        group_key = (n0.get("demand_source_doctype") or "Demanda", n0.get("demand_source_name") or "Manual")
-        demands_group[group_key].append(n0)
+    visited = set()
+    def build_tree_fast(parent_node):
+        if parent_node["name"] in visited:
+            return
+        visited.add(parent_node["name"])
+
+        next_lvl = cint(parent_node["bom_level"]) + 1
+        p_code = parent_node["child_item"]
+
+        candidates = children_by_parent.get((p_code, next_lvl), [])
+        for cand in candidates:
+            cand_copy = dict(cand)
+            cand_copy["children"] = []
+            build_tree_fast(cand_copy)
+            parent_node["children"].append(cand_copy)
+
+    for r in root_nodes:
+        build_tree_fast(r)
+
+    # Identifica pedidos de venda / requisições
+    item_root_demand = {}
+    for r in root_nodes:
+        if r.get("demand_source_doctype") in ("Sales Order", "Material Request"):
+            item_root_demand[r["child_item"]] = (r["demand_source_doctype"], r["demand_source_name"])
+
+    roots_by_demand = defaultdict(list)
+    for r in root_nodes:
+        doc_type = r.get("demand_source_doctype")
+        doc_name = r.get("demand_source_name")
+
+        if (not doc_type or doc_type in ("Manual", "BOM Dependent")) and r["child_item"] in item_root_demand:
+            doc_type, doc_name = item_root_demand[r["child_item"]]
+            r["demand_source_doctype"] = doc_type
+            r["demand_source_name"] = doc_name
+
+        if doc_type and doc_type not in ("Manual", "BOM Dependent"):
+            key = (doc_type, doc_name)
+        else:
+            key = ("Planejamento / Estoque", "Reposição de Segurança e Ponto de Pedido")
+
+        roots_by_demand[key].append(r)
 
     tree = []
-    for (src_type, src_name), items in demands_group.items():
+    # 1. Primeiro as ordens com demanda real (Pedidos de Venda, Requisições)
+    for (src_type, src_name), branch_roots in roots_by_demand.items():
+        if src_type != "Planejamento / Estoque":
+            tree.append({
+                "is_root_demand": True,
+                "demand_source_doctype": src_type,
+                "demand_source_name": src_name,
+                "label": f"{src_type}: {src_name}",
+                "children": branch_roots
+            })
+
+    # 2. Depois demandas de manutenção de estoque / segurança
+    if ("Planejamento / Estoque", "Reposição de Segurança e Ponto de Pedido") in roots_by_demand:
+        branch_roots = roots_by_demand[("Planejamento / Estoque", "Reposição de Segurança e Ponto de Pedido")]
         tree.append({
             "is_root_demand": True,
-            "demand_source_doctype": src_type,
-            "demand_source_name": src_name,
-            "label": f"{src_type}: {src_name}",
-            "children": items
+            "demand_source_doctype": "Estoque de Segurança",
+            "demand_source_name": "Reposição Automática (Ponto de Pedido)",
+            "label": "Estoque de Segurança: Reposição Automática",
+            "children": branch_roots
         })
 
     return tree
@@ -390,7 +538,7 @@ def import_manual_demands(ticket_name, file_url=None):
 
         # Validate item
         if not frappe.db.exists("Item", item_code):
-            errors.append(f"Linha {row_num}: Item '{item_code}' não encontrado no cadastro do ERPNext.")
+            errors.append(f"Linha {row_num}: Item '{item_code}' não encontrado no cadastro do ERPZ.")
             continue
 
         # Validate qty
@@ -556,3 +704,109 @@ def export_mrp_excel(ticket_name):
     buf = io.BytesIO()
     wb.save(buf)
     provide_binary_file(f"Planejamento_MRP_{ticket_name}", "xlsx", buf.getvalue())
+
+# -------------------------------------------------------------------------
+# CENTRAL DE IMPORTAÇÃO DE CADASTROS (PRODUTOS, ESTOQUE, RECURSOS, BOM, CLIENTES, FORNECEDORES)
+# -------------------------------------------------------------------------
+
+@frappe.whitelist()
+def download_cadastros_template(import_type):
+    """Generates and downloads styled Excel template for any of the 7 cadastros."""
+    import io
+    from frappe.desk.utils import provide_binary_file
+    from erpz_mrp.importer import generate_template_workbook
+
+    wb, filename = generate_template_workbook(import_type)
+    buf = io.BytesIO()
+    wb.save(buf)
+    provide_binary_file(filename, "xlsx", buf.getvalue())
+
+@frappe.whitelist()
+def import_cadastros(import_type, file_url=None, company=None):
+    """
+    Imports cadastros from uploaded Excel/CSV file:
+    - items: Produtos / Itens (SB1)
+    - stock: Estoque dos Itens (SB9)
+    - workstations: Recursos / Postos de Trabalho (SH1)
+    - alternative_resources: Recursos Alternativos (SH2)
+    - bom: Estrutura BOM dos Itens (SG1 - Dono e Componente lado a lado)
+    - customers: Clientes (SA1)
+    - suppliers: Fornecedores (SA2)
+    """
+    from erpz_mrp.importer import execute_import
+
+    file_content = None
+    filename = "upload.xlsx"
+
+    if "file" in frappe.request.files:
+        f = frappe.request.files["file"]
+        filename = f.filename
+        file_content = f.read()
+    elif file_url:
+        _file = frappe.get_doc("File", {"file_url": file_url})
+        filename = _file.file_name or "upload.xlsx"
+        file_content = _file.get_content()
+
+    if not file_content:
+        frappe.throw(_("Nenhum arquivo enviado para importação."))
+
+    res = execute_import(import_type, file_content, filename, company)
+    return res
+
+@frappe.whitelist()
+def get_import_center_options():
+    """Returns available cadastros and company list for the frontend modal."""
+    companies = frappe.get_all("Company", fields=["name", "company_name", "default_currency"])
+    default_company = frappe.defaults.get_user_default("Company") or (companies[0].name if companies else "")
+
+    cadastros = [
+        {
+            "id": "items",
+            "label": "1 - Produtos / Itens",
+            "description": "Cadastro e atualização de Itens no ERPZ com estoque mínimo, ponto de pedido, estoque de segurança e lote mínimo.",
+            "template_name": "Modelo_Importacao_Produtos_Itens.xlsx"
+        },
+        {
+            "id": "stock",
+            "label": "2 - Saldos de Estoque dos Itens",
+            "description": "Carga de saldo inicial de estoque por armazém e valor de avaliação via Reconciliação de Estoque no ERPZ.",
+            "template_name": "Modelo_Importacao_Estoque_Itens.xlsx"
+        },
+        {
+            "id": "workstations",
+            "label": "3 - Recursos / Postos de Trabalho",
+            "description": "Cadastro de Postos de Trabalho no ERPZ e Recursos no APS com capacidade diária, eficiência e finais de semana.",
+            "template_name": "Modelo_Importacao_Recursos_Postos_Trabalho.xlsx"
+        },
+        {
+            "id": "alternative_resources",
+            "label": "4 - Recursos Alternativos",
+            "description": "Vinculação de Recursos Alternativos e Secundários aos Postos Principais com prioridade e fator de eficiência.",
+            "template_name": "Modelo_Importacao_Recursos_Alternativos.xlsx"
+        },
+        {
+            "id": "bom",
+            "label": "5 - Estrutura de Produtos (BOM)",
+            "description": "Estrutura do produto onde o Dono do Registro (Pai) e o Componente (Filho) ficam lado a lado por linha, gerando BOMs no ERPZ.",
+            "template_name": "Modelo_Importacao_Estrutura_BOM.xlsx"
+        },
+        {
+            "id": "customers",
+            "label": "6 - Clientes",
+            "description": "Importação de Clientes no ERPZ com Razão Social, Nome Fantasia, CNPJ/CPF, Inscrição Estadual, telefone e e-mail.",
+            "template_name": "Modelo_Importacao_Clientes.xlsx"
+        },
+        {
+            "id": "suppliers",
+            "label": "7 - Fornecedores",
+            "description": "Importação de Fornecedores no ERPZ com Razão Social, CNPJ/CPF, Inscrição Estadual, contatos e endereço.",
+            "template_name": "Modelo_Importacao_Fornecedores.xlsx"
+        }
+    ]
+
+    return {
+        "cadastros": cadastros,
+        "companies": companies,
+        "default_company": default_company
+    }
+

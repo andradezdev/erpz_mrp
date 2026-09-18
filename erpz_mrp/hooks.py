@@ -17,9 +17,15 @@ after_migrate = "erpz_mrp.setup.after_migrate"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/erpz_mrp/css/erpz_mrp.css"
-# app_include_js = "/assets/erpz_mrp/js/erpz_mrp.js"
+app_include_js = "/assets/erpz_mrp/js/erpz_mrp.js"
 
 # DocType List JS
 doctype_list_js = {
-	"MRP Result": "erpz_mrp/doctype/mrp_result/mrp_result_list.js"
+	"MRP Result": "erpz_mrp/doctype/mrp_result/mrp_result_list.js",
+	"Data Import": "public/js/data_import_list.js"
+}
+
+# DocType Form JS
+doctype_js = {
+	"Data Import": "public/js/data_import.js"
 }

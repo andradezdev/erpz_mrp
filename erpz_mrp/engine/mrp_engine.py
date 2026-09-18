@@ -580,11 +580,11 @@ class MRPEngine:
                 has_shortage = True
                 shortage_type = "Ruptura Total (Saldo Negativo)"
                 shortage = (effective_safety_target - projected) if effective_safety_target > 0 else abs(projected)
-            elif min_stock > 0 and projected <= min_stock:
+            elif min_stock > 0 and projected < min_stock:
                 has_shortage = True
                 shortage_type = "Abaixo do Estoque Mínimo"
                 shortage = max(min_stock, effective_safety_target) - projected
-            elif critical_safety_threshold > 0 and projected <= critical_safety_threshold:
+            elif critical_safety_threshold > 0 and projected < critical_safety_threshold:
                 has_shortage = True
                 shortage_type = "Abaixo do Ponto de Pedido + Segurança"
                 shortage = critical_safety_threshold - projected
@@ -592,6 +592,9 @@ class MRPEngine:
                 has_shortage = True
                 shortage_type = "Abaixo do Estoque de Segurança"
                 shortage = safety_stock_val - projected
+
+            if shortage <= 0.0001:
+                has_shortage = False
 
             if has_shortage:
                 suggested_qty = self.apply_lot_sizing(item_code, shortage)
@@ -763,26 +766,29 @@ class MRPEngine:
         }
         self.results.append(result_dict)
         
-        # Add to Traceability node
-        self.traceability.append({
-            "mrp_ticket": self.ticket_name,
-            "demand_source_doctype": origin_doctype,
-            "demand_source_name": origin_name,
-            "root_item": origin_item,
-            "parent_item": origin_item if origin_item != item_code else None,
-            "child_item": item_code,
-            "bom_level": current_level,
-            "required_qty": net_qty,
-            "allocated_qty": suggested_qty,
-            "supply_type": supply_type,
-            "from_company": from_company or company,
-            "to_company": company,
-            "need_date": need_date,
-            "planned_start_date": supply_date,
-            "target_doctype": "Work Order" if supply_type == "Produção" else ("Material Request" if supply_type == "Compra" else "Stock Entry"),
-            "target_docname": "Sugestão",
-            "status": "Planejado"
-        })
+        # Add to Traceability node only if suggested_qty > 0
+        if suggested_qty > 0.0001:
+            root_src_type = origin_doc.get("root_demand_doctype") or origin_doctype
+            root_src_name = origin_doc.get("root_demand_name") or origin_name
+            self.traceability.append({
+                "mrp_ticket": self.ticket_name,
+                "demand_source_doctype": root_src_type,
+                "demand_source_name": root_src_name,
+                "root_item": origin_item,
+                "parent_item": origin_doc.get("parent_item") if origin_doc.get("parent_item") else (origin_item if origin_item != item_code else None),
+                "child_item": item_code,
+                "bom_level": current_level,
+                "required_qty": net_qty,
+                "allocated_qty": suggested_qty,
+                "supply_type": supply_type,
+                "from_company": from_company or company,
+                "to_company": company,
+                "need_date": need_date,
+                "planned_start_date": supply_date,
+                "target_doctype": "Work Order" if supply_type == "Produção" else ("Material Request" if supply_type == "Compra" else "Stock Entry"),
+                "target_docname": "Sugestão",
+                "status": "Planejado"
+            })
         
         # 3. Explosão Multinível da Estrutura (BOM Recursion)
         # If Produced, explode components and push into queue for next level
@@ -806,6 +812,8 @@ class MRPEngine:
                 # The component must be ready at the start of parent production
                 component_need_date = supply_date
                 
+                root_demand_doc = origin_doc.get("root_demand_doctype") or origin_doctype
+                root_demand_n = origin_doc.get("root_demand_name") or origin_name
                 pending_demands_queue.append({
                     "item_code": child_code,
                     "item_name": comp.item_name,
@@ -816,8 +824,11 @@ class MRPEngine:
                     "uom": comp.stock_uom,
                     "source_type": "BOM Dependent",
                     "source_name": f"Sugestão OP: {item_code}",
+                    "root_demand_doctype": root_demand_doc,
+                    "root_demand_name": root_demand_n,
                     "source_item_row": comp.name,
                     "origin_item": origin_item,
+                    "parent_item": item_code,
                     "bom_level": current_level + 1
                 })
 

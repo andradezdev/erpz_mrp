@@ -28,13 +28,14 @@ def get_bucket_key(dt, periodicity="Semanal"):
 
 def aglutinate_results(results_list, periodicity="Semanal", apply_lot_sizing_callback=None):
     """
-    Consolidates list of suggestion dicts belonging to the same (item_code, company, supply_type, bucket_key).
-    Crucial: Preserves all individual origins so each demand row is tracked!
-    
-    Returns:
-    - consolidated_results: list of new or updated result dicts marked with is_aglutinated=1
-    - aglutination_links: list of dicts to insert into tabMRP Aglutination Link
+    Consolida sugestões de suprimento. Se configurado para Não Aglutinar, mantém a relação 1:1 estrita
+    entre cada Pedido de Venda e sua respectiva Ordem de Produção/Compra.
     """
+    if "Não Aglutinar" in periodicity or "Sem Aglutinação" in periodicity or periodicity == "Não Aglutinar":
+        for r in results_list:
+            r["is_aglutinated"] = 0
+            r["aglutinated_items_count"] = 1
+        return results_list, []
     grouped = defaultdict(list)
     
     for res in results_list:

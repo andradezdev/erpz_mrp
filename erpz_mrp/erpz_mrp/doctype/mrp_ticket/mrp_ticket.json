@@ -1,360 +1,360 @@
 {
- "actions": [],
- "creation": "2026-09-12 19:35:00.000000",
- "doctype": "DocType",
- "engine": "InnoDB",
- "field_order": [
-  "naming_series",
-  "title",
-  "status",
-  "sec_scope",
-  "company",
-  "company_group",
-  "from_date",
-  "to_date",
-  "periodicity",
-  "col_scope_2",
-  "is_simulation",
-  "allow_multi_company",
-  "allow_partial_supply",
-  "aglutinate_demands",
-  "aglutination_period",
-  "sec_sources",
-  "consider_sales_orders",
-  "consider_production_plans",
-  "consider_material_requests",
-  "col_sources_2",
-  "consider_purchase_orders",
-  "consider_work_orders",
-  "consider_safety_stock",
-  "sec_filters",
-  "item_group_filter",
-  "item_filter",
-  "warehouse_filter",
-  "sec_metrics",
-  "total_demands",
-  "total_suggestions",
-  "total_produced",
-  "total_purchased",
-  "total_transferred",
-  "total_inconsistencies",
-  "col_audit",
-  "calculated_on",
-  "calculated_by",
-  "approved_on",
-  "approved_by",
-  "executed_on",
-  "executed_by",
-  "execution_time_seconds"
- ],
- "fields": [
-  {
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "label": "Série",
-   "options": "MRP-.YYYY.-.#####",
-   "default": "MRP-.YYYY.-.#####",
-   "reqd": 1
-  },
-  {
-   "fieldname": "title",
-   "fieldtype": "Data",
-   "label": "Descrição do Cenário",
-   "in_list_view": 1
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Situação",
-   "options": "Em Preparação\nProcessando\nCalculado\nEm Análise\nAprovado\nEfetivado\nCancelado\nCom Inconsistências",
-   "default": "Em Preparação",
-   "reqd": 1,
-   "in_list_view": 1,
-   "in_standard_filter": 1
-  },
-  {
-   "fieldname": "sec_scope",
-   "fieldtype": "Section Break",
-   "label": "Escopo e Período de Planejamento"
-  },
-  {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Empresa Centralizadora",
-   "options": "Company",
-   "reqd": 1,
-   "in_list_view": 1,
-   "in_standard_filter": 1
-  },
-  {
-   "fieldname": "company_group",
-   "fieldtype": "Link",
-   "label": "Grupo Multiempresa",
-   "options": "MRP Company Group"
-  },
-  {
-   "fieldname": "from_date",
-   "fieldtype": "Date",
-   "label": "Data Inicial do Horizonte",
-   "reqd": 1,
-   "in_list_view": 1
-  },
-  {
-   "fieldname": "to_date",
-   "fieldtype": "Date",
-   "label": "Data Final do Horizonte",
-   "reqd": 1,
-   "in_list_view": 1
-  },
-  {
-   "fieldname": "periodicity",
-   "fieldtype": "Select",
-   "label": "Periodicidade da Linha do Tempo",
-   "options": "Diária\nSemanal\nQuinzenal\nMensal",
-   "default": "Diária",
-   "reqd": 1
-  },
-  {
-   "fieldname": "col_scope_2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "is_simulation",
-   "fieldtype": "Check",
-   "label": "Modo Simulação (Não gera definitivos)",
-   "default": "0"
-  },
-  {
-   "fieldname": "allow_multi_company",
-   "fieldtype": "Check",
-   "label": "Habilitar Transferência Multiempresa",
-   "default": "1"
-  },
-  {
-   "fieldname": "allow_partial_supply",
-   "fieldtype": "Check",
-   "label": "Permitir Atendimento Parcial entre Empresas",
-   "default": "1"
-  },
-  {
-   "fieldname": "aglutinate_demands",
-   "fieldtype": "Check",
-   "label": "Aglutinar Ordens por Periodicidade",
-   "default": "0"
-  },
-  {
-   "fieldname": "aglutination_period",
-   "fieldtype": "Select",
-   "label": "Período de Aglutinação",
-   "options": "Diária\nSemanal\nQuinzenal\nMensal",
-   "default": "Semanal"
-  },
-  {
-   "fieldname": "sec_sources",
-   "fieldtype": "Section Break",
-   "label": "Fontes de Demanda e Entrada"
-  },
-  {
-   "fieldname": "consider_sales_orders",
-   "fieldtype": "Check",
-   "label": "Pedidos de Venda (Sales Orders)",
-   "default": "1"
-  },
-  {
-   "fieldname": "consider_production_plans",
-   "fieldtype": "Check",
-   "label": "Planos de Produção (Production Plans)",
-   "default": "1"
-  },
-  {
-   "fieldname": "consider_material_requests",
-   "fieldtype": "Check",
-   "label": "Requisições de Material (Material Requests)",
-   "default": "1"
-  },
-  {
-   "fieldname": "col_sources_2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "consider_purchase_orders",
-   "fieldtype": "Check",
-   "label": "Ordens de Compra Previstas (Purchase Orders)",
-   "default": "1"
-  },
-  {
-   "fieldname": "consider_work_orders",
-   "fieldtype": "Check",
-   "label": "Ordens de Produção Previstas (Work Orders)",
-   "default": "1"
-  },
-  {
-   "fieldname": "consider_safety_stock",
-   "fieldtype": "Check",
-   "label": "Considerar Estoque de Segurança",
-   "default": "1"
-  },
-  {
-   "fieldname": "sec_filters",
-   "fieldtype": "Section Break",
-   "label": "Filtros Opcionais de Execução"
-  },
-  {
-   "fieldname": "item_group_filter",
-   "fieldtype": "Link",
-   "label": "Grupo de Itens",
-   "options": "Item Group"
-  },
-  {
-   "fieldname": "item_filter",
-   "fieldtype": "Link",
-   "label": "Item Específico",
-   "options": "Item"
-  },
-  {
-   "fieldname": "warehouse_filter",
-   "fieldtype": "Link",
-   "label": "Depósito Específico",
-   "options": "Warehouse"
-  },
-  {
-   "fieldname": "sec_metrics",
-   "fieldtype": "Section Break",
-   "label": "Estatísticas do Cenário"
-  },
-  {
-   "fieldname": "total_demands",
-   "fieldtype": "Int",
-   "label": "Total Demandas",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_suggestions",
-   "fieldtype": "Int",
-   "label": "Sugestões de Abastecimento",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_produced",
-   "fieldtype": "Int",
-   "label": "Sugestões de Produção",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_purchased",
-   "fieldtype": "Int",
-   "label": "Sugestões de Compra",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_transferred",
-   "fieldtype": "Int",
-   "label": "Sugestões de Transferência",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_inconsistencies",
-   "fieldtype": "Int",
-   "label": "Alertas / Inconsistências",
-   "read_only": 1
-  },
-  {
-   "fieldname": "col_audit",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "calculated_on",
-   "fieldtype": "Datetime",
-   "label": "Data/Hora Cálculo",
-   "read_only": 1
-  },
-  {
-   "fieldname": "calculated_by",
-   "fieldtype": "Link",
-   "label": "Calculado Por",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "approved_on",
-   "fieldtype": "Datetime",
-   "label": "Data/Hora Aprovação",
-   "read_only": 1
-  },
-  {
-   "fieldname": "approved_by",
-   "fieldtype": "Link",
-   "label": "Aprovado Por",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "executed_on",
-   "fieldtype": "Datetime",
-   "label": "Data/Hora Efetivação",
-   "read_only": 1
-  },
-  {
-   "fieldname": "executed_by",
-   "fieldtype": "Link",
-   "label": "Efetivado Por",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "execution_time_seconds",
-   "fieldtype": "Float",
-   "label": "Tempo de Execução (s)",
-   "read_only": 1
-  }
- ],
- "links": [],
- "modified": "2026-09-12 19:35:00.000000",
- "modified_by": "Administrator",
- "module": "ERPZ MRP",
- "name": "MRP Ticket",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Manufacturing Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 0,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Manufacturing User",
-   "share": 1,
-   "write": 1
-  }
- ],
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": [],
- "track_changes": 1,
- "autoname": "naming_series:"
+    "actions": [],
+    "creation": "2026-09-12 19:35:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "naming_series",
+        "title",
+        "status",
+        "sec_scope",
+        "company",
+        "company_group",
+        "from_date",
+        "to_date",
+        "periodicity",
+        "col_scope_2",
+        "is_simulation",
+        "allow_multi_company",
+        "allow_partial_supply",
+        "aglutinate_demands",
+        "aglutination_period",
+        "sec_sources",
+        "consider_sales_orders",
+        "consider_production_plans",
+        "consider_material_requests",
+        "col_sources_2",
+        "consider_purchase_orders",
+        "consider_work_orders",
+        "consider_safety_stock",
+        "sec_filters",
+        "item_group_filter",
+        "item_filter",
+        "warehouse_filter",
+        "sec_metrics",
+        "total_demands",
+        "total_suggestions",
+        "total_produced",
+        "total_purchased",
+        "total_transferred",
+        "total_inconsistencies",
+        "col_audit",
+        "calculated_on",
+        "calculated_by",
+        "approved_on",
+        "approved_by",
+        "executed_on",
+        "executed_by",
+        "execution_time_seconds"
+    ],
+    "fields": [
+        {
+            "fieldname": "naming_series",
+            "fieldtype": "Select",
+            "label": "Série",
+            "options": "MRP-.YYYY.-.#####",
+            "default": "MRP-.YYYY.-.#####",
+            "reqd": 1
+        },
+        {
+            "fieldname": "title",
+            "fieldtype": "Data",
+            "label": "Descrição do Cenário",
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Situação",
+            "options": "Em Preparação\nProcessando\nCalculado\nEm Análise\nAprovado\nEfetivado\nCancelado\nCom Inconsistências",
+            "default": "Em Preparação",
+            "reqd": 1,
+            "in_list_view": 1,
+            "in_standard_filter": 1
+        },
+        {
+            "fieldname": "sec_scope",
+            "fieldtype": "Section Break",
+            "label": "Escopo e Período de Planejamento"
+        },
+        {
+            "fieldname": "company",
+            "fieldtype": "Link",
+            "label": "Empresa Centralizadora",
+            "options": "Company",
+            "reqd": 1,
+            "in_list_view": 1,
+            "in_standard_filter": 1
+        },
+        {
+            "fieldname": "company_group",
+            "fieldtype": "Link",
+            "label": "Grupo Multiempresa",
+            "options": "MRP Company Group"
+        },
+        {
+            "fieldname": "from_date",
+            "fieldtype": "Date",
+            "label": "Data Inicial do Horizonte",
+            "reqd": 1,
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "to_date",
+            "fieldtype": "Date",
+            "label": "Data Final do Horizonte",
+            "reqd": 1,
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "periodicity",
+            "fieldtype": "Select",
+            "label": "Periodicidade da Linha do Tempo",
+            "options": "Não Aglutinar (Ordem a Ordem)\nDiária\nSemanal\nQuinzenal\nMensal",
+            "default": "Não Aglutinar (Ordem a Ordem)",
+            "reqd": 1
+        },
+        {
+            "fieldname": "col_scope_2",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "is_simulation",
+            "fieldtype": "Check",
+            "label": "Modo Simulação (Não gera definitivos)",
+            "default": "0"
+        },
+        {
+            "fieldname": "allow_multi_company",
+            "fieldtype": "Check",
+            "label": "Habilitar Transferência Multiempresa",
+            "default": "1"
+        },
+        {
+            "fieldname": "allow_partial_supply",
+            "fieldtype": "Check",
+            "label": "Permitir Atendimento Parcial entre Empresas",
+            "default": "1"
+        },
+        {
+            "fieldname": "aglutinate_demands",
+            "fieldtype": "Check",
+            "label": "Aglutinar Ordens por Periodicidade",
+            "default": "0"
+        },
+        {
+            "fieldname": "aglutination_period",
+            "fieldtype": "Select",
+            "label": "Período de Aglutinação",
+            "options": "Diária\nSemanal\nQuinzenal\nMensal",
+            "default": "Semanal"
+        },
+        {
+            "fieldname": "sec_sources",
+            "fieldtype": "Section Break",
+            "label": "Fontes de Demanda e Entrada"
+        },
+        {
+            "fieldname": "consider_sales_orders",
+            "fieldtype": "Check",
+            "label": "Pedidos de Venda (Sales Orders)",
+            "default": "1"
+        },
+        {
+            "fieldname": "consider_production_plans",
+            "fieldtype": "Check",
+            "label": "Planos de Produção (Production Plans)",
+            "default": "1"
+        },
+        {
+            "fieldname": "consider_material_requests",
+            "fieldtype": "Check",
+            "label": "Requisições de Material (Material Requests)",
+            "default": "1"
+        },
+        {
+            "fieldname": "col_sources_2",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "consider_purchase_orders",
+            "fieldtype": "Check",
+            "label": "Ordens de Compra Previstas (Purchase Orders)",
+            "default": "1"
+        },
+        {
+            "fieldname": "consider_work_orders",
+            "fieldtype": "Check",
+            "label": "Ordens de Produção Previstas (Work Orders)",
+            "default": "1"
+        },
+        {
+            "fieldname": "consider_safety_stock",
+            "fieldtype": "Check",
+            "label": "Considerar Estoque de Segurança",
+            "default": "1"
+        },
+        {
+            "fieldname": "sec_filters",
+            "fieldtype": "Section Break",
+            "label": "Filtros Opcionais de Execução"
+        },
+        {
+            "fieldname": "item_group_filter",
+            "fieldtype": "Link",
+            "label": "Grupo de Itens",
+            "options": "Item Group"
+        },
+        {
+            "fieldname": "item_filter",
+            "fieldtype": "Link",
+            "label": "Item Específico",
+            "options": "Item"
+        },
+        {
+            "fieldname": "warehouse_filter",
+            "fieldtype": "Link",
+            "label": "Depósito Específico",
+            "options": "Warehouse"
+        },
+        {
+            "fieldname": "sec_metrics",
+            "fieldtype": "Section Break",
+            "label": "Estatísticas do Cenário"
+        },
+        {
+            "fieldname": "total_demands",
+            "fieldtype": "Int",
+            "label": "Total Demandas",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_suggestions",
+            "fieldtype": "Int",
+            "label": "Sugestões de Abastecimento",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_produced",
+            "fieldtype": "Int",
+            "label": "Sugestões de Produção",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_purchased",
+            "fieldtype": "Int",
+            "label": "Sugestões de Compra",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_transferred",
+            "fieldtype": "Int",
+            "label": "Sugestões de Transferência",
+            "read_only": 1
+        },
+        {
+            "fieldname": "total_inconsistencies",
+            "fieldtype": "Int",
+            "label": "Alertas / Inconsistências",
+            "read_only": 1
+        },
+        {
+            "fieldname": "col_audit",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "calculated_on",
+            "fieldtype": "Datetime",
+            "label": "Data/Hora Cálculo",
+            "read_only": 1
+        },
+        {
+            "fieldname": "calculated_by",
+            "fieldtype": "Link",
+            "label": "Calculado Por",
+            "options": "User",
+            "read_only": 1
+        },
+        {
+            "fieldname": "approved_on",
+            "fieldtype": "Datetime",
+            "label": "Data/Hora Aprovação",
+            "read_only": 1
+        },
+        {
+            "fieldname": "approved_by",
+            "fieldtype": "Link",
+            "label": "Aprovado Por",
+            "options": "User",
+            "read_only": 1
+        },
+        {
+            "fieldname": "executed_on",
+            "fieldtype": "Datetime",
+            "label": "Data/Hora Efetivação",
+            "read_only": 1
+        },
+        {
+            "fieldname": "executed_by",
+            "fieldtype": "Link",
+            "label": "Efetivado Por",
+            "options": "User",
+            "read_only": 1
+        },
+        {
+            "fieldname": "execution_time_seconds",
+            "fieldtype": "Float",
+            "label": "Tempo de Execução (s)",
+            "read_only": 1
+        }
+    ],
+    "links": [],
+    "modified": "2026-09-12 19:35:00.000000",
+    "modified_by": "Administrator",
+    "module": "ERPZ MRP",
+    "name": "MRP Ticket",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Manufacturing Manager",
+            "share": 1,
+            "write": 1
+        },
+        {
+            "create": 1,
+            "delete": 0,
+            "email": 1,
+            "export": 1,
+            "print": 1,
+            "read": 1,
+            "report": 1,
+            "role": "Manufacturing User",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": [],
+    "track_changes": 1,
+    "autoname": "naming_series:"
 }

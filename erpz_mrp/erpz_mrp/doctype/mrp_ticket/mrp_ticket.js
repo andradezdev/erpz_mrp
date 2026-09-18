@@ -53,18 +53,18 @@ frappe.ui.form.on("MRP Ticket", {
 		// Button: Efetivar Documentos
 		if (frm.doc.status === "Aprovado") {
 			frm.add_custom_button(__("Efetivar Abastecimento (Gerar OPs/OCs)"), function() {
-				frappe.confirm(__("Atenção: A efetivação criará as Ordens de Produção, Solicitações de Compra e Transferências definitivas no ERPNext vinculadas a este Ticket. Deseja prosseguir?"), function() {
+				frappe.confirm(__("Atenção: A efetivação criará as Ordens de Produção, Solicitações de Compra e Transferências definitivas no ERPZ vinculadas a este Ticket. Deseja prosseguir?"), function() {
 					frappe.call({
 						method: "erpz_mrp.api.execute_ticket",
 						args: { ticket_name: frm.doc.name },
 						freeze: true,
-						freeze_message: __("Gerando Ordens de Produção e Requisições no ERPNext..."),
+						freeze_message: __("Gerando Ordens de Produção e Requisições no ERPZ..."),
 						callback: function(r) {
 							if (r.message) {
 								frappe.msgprint({
 									title: __("Efetivação Concluída"),
 									indicator: "green",
-									message: __("Foram gerados {0} documentos no ERPNext vinculados ao Ticket.", [r.message.created_count])
+									message: __("Foram gerados {0} documentos no ERPZ vinculados ao Ticket.", [r.message.created_count])
 								});
 								frm.reload_doc();
 							}
